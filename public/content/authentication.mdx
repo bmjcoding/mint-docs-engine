@@ -1,0 +1,112 @@
+---
+title: Authentication
+description: Learn how to authenticate your requests to the Acme API.
+icon: lock
+---
+
+All API requests to Acme require authentication. We support two authentication methods: API keys and OAuth 2.0.
+
+## API Key Authentication
+
+The simplest way to authenticate is with an API key. Include it in the `Authorization` header of every request:
+
+```bash
+curl -X GET https://api.acme.com/v1/users \
+  -H "Authorization: Bearer sk_live_abc123..."
+```
+
+<Note>
+  API keys carry significant privileges. Keep them secure and never expose them in client-side code.
+</Note>
+
+### Key Types
+
+Acme provides two types of API keys:
+
+| Key Type | Prefix | Use Case |
+|----------|--------|----------|
+| Live | `sk_live_` | Production environments |
+| Test | `sk_test_` | Development and testing |
+
+<Tip>
+  Test keys only work with test data and cannot affect your production environment.
+</Tip>
+
+## OAuth 2.0
+
+For applications that act on behalf of users, use OAuth 2.0. This is the recommended approach for third-party integrations.
+
+### Authorization Code Flow
+
+<Steps>
+  <Step title="Redirect to Authorization">
+    Send users to the Acme authorization endpoint:
+
+    ```
+    https://auth.acme.com/oauth/authorize?
+      client_id=YOUR_CLIENT_ID&
+      redirect_uri=YOUR_REDIRECT_URI&
+      response_type=code&
+      scope=users.read projects.write
+    ```
+  </Step>
+  <Step title="Exchange the Code">
+    After the user authorizes, exchange the code for tokens:
+
+    ```bash
+    curl -X POST https://auth.acme.com/oauth/token \
+      -d "grant_type=authorization_code" \
+      -d "code=AUTH_CODE" \
+      -d "client_id=YOUR_CLIENT_ID" \
+      -d "client_secret=YOUR_CLIENT_SECRET" \
+      -d "redirect_uri=YOUR_REDIRECT_URI"
+    ```
+  </Step>
+  <Step title="Use the Access Token">
+    Include the access token in your API requests:
+
+    ```bash
+    curl -X GET https://api.acme.com/v1/users \
+      -H "Authorization: Bearer ACCESS_TOKEN"
+    ```
+  </Step>
+</Steps>
+
+### Available Scopes
+
+<Accordion title="View all available scopes">
+  | Scope | Description |
+  |-------|-------------|
+  | `users.read` | Read user profiles |
+  | `users.write` | Create and update users |
+  | `projects.read` | Read project data |
+  | `projects.write` | Create and manage projects |
+  | `webhooks.read` | Read webhook configurations |
+  | `webhooks.write` | Create and manage webhooks |
+</Accordion>
+
+## Rate Limiting
+
+API requests are rate limited to ensure fair usage:
+
+- **Standard tier**: 100 requests per minute
+- **Pro tier**: 1,000 requests per minute  
+- **Enterprise tier**: Custom limits
+
+<Warning>
+  When you exceed the rate limit, the API returns a `429 Too Many Requests` response. Implement exponential backoff in your retry logic.
+</Warning>
+
+### Rate Limit Headers
+
+Every response includes rate limit information:
+
+```http
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1616029200
+```
+
+<Danger>
+  Never retry requests in a tight loop without implementing backoff. This can result in your API key being temporarily suspended.
+</Danger>

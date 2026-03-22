@@ -1,0 +1,168 @@
+---
+title: Projects
+description: Manage projects and their settings through the Acme API.
+icon: folder
+---
+
+Projects are the top-level organizational unit in Acme. Each project has isolated data, separate API keys, and its own configuration.
+
+## List Projects
+
+Retrieve all projects accessible to the authenticated user.
+
+```bash
+GET /v1/projects
+```
+
+### Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `limit` | integer | Maximum number of results (1-100, default 20) |
+| `offset` | integer | Number of results to skip |
+| `status` | string | Filter by status: `active`, `archived` |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "id": "prj_xyz789",
+      "name": "Production App",
+      "description": "Main production application",
+      "status": "active",
+      "created_at": "2026-01-15T10:00:00Z",
+      "updated_at": "2026-03-20T08:00:00Z",
+      "settings": {
+        "timezone": "America/New_York",
+        "webhook_url": "https://app.example.com/webhooks"
+      }
+    }
+  ],
+  "has_more": false,
+  "total": 3
+}
+```
+
+## Create Project
+
+Create a new project.
+
+```bash
+POST /v1/projects
+```
+
+### Request Body
+
+```json
+{
+  "name": "My New Project",
+  "description": "A project for testing the API",
+  "settings": {
+    "timezone": "UTC"
+  }
+}
+```
+
+<Note>
+  Each account can have up to 10 projects on the free plan. Upgrade to Pro for unlimited projects.
+</Note>
+
+### Response
+
+```json
+{
+  "id": "prj_new456",
+  "name": "My New Project",
+  "description": "A project for testing the API",
+  "status": "active",
+  "created_at": "2026-03-21T15:00:00Z",
+  "updated_at": "2026-03-21T15:00:00Z",
+  "settings": {
+    "timezone": "UTC"
+  },
+  "api_keys": {
+    "live": "sk_live_...",
+    "test": "sk_test_..."
+  }
+}
+```
+
+<Warning>
+  The API keys are only returned once during project creation. Store them securely immediately.
+</Warning>
+
+## Get Project
+
+Retrieve a single project by ID.
+
+```bash
+GET /v1/projects/:id
+```
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl -X GET https://api.acme.com/v1/projects/prj_xyz789 \
+      -H "Authorization: Bearer sk_live_abc123"
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    const project = await client.projects.get('prj_xyz789');
+    console.log(project);
+    ```
+  </Tab>
+</Tabs>
+
+## Update Project
+
+Update a project's name, description, or settings.
+
+```bash
+PATCH /v1/projects/:id
+```
+
+```json
+{
+  "name": "Renamed Project",
+  "settings": {
+    "timezone": "Europe/London",
+    "webhook_url": "https://new-app.example.com/webhooks"
+  }
+}
+```
+
+## Archive Project
+
+Archive a project. Archived projects retain their data but cannot process new API requests.
+
+```bash
+POST /v1/projects/:id/archive
+```
+
+<Info>
+  Archiving a project is reversible. Use the unarchive endpoint to restore it. All data and configuration are preserved.
+</Info>
+
+## Delete Project
+
+Permanently delete a project and all associated data.
+
+```bash
+DELETE /v1/projects/:id
+```
+
+<Danger>
+  This permanently deletes the project, all users, all data, and all API keys. This action cannot be undone.
+</Danger>
+
+### Response
+
+```json
+{
+  "id": "prj_xyz789",
+  "deleted": true
+}
+```

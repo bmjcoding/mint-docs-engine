@@ -1,0 +1,104 @@
+---
+title: Quickstart
+description: Get up and running with the Acme API in under 5 minutes.
+icon: rocket
+---
+
+Follow these steps to make your first API call with Acme.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- An Acme account ([sign up here](https://example.com))
+- Node.js 18+ or Python 3.9+ installed
+- A terminal or command-line interface
+
+## Setup Guide
+
+<Steps>
+  <Step title="Create a Project">
+    Log in to your Acme dashboard and create a new project. Give it a descriptive name like "My First App".
+
+    Each project gets its own set of API keys and isolated data.
+  </Step>
+  <Step title="Get Your API Key">
+    Navigate to **Settings → API Keys** in your project dashboard. Click **Create Key** and copy the generated key.
+
+    <Warning>
+      Keep your API key secure. Never expose it in client-side code or commit it to version control.
+    </Warning>
+  </Step>
+  <Step title="Install the SDK">
+    Install the Acme SDK for your language of choice:
+
+    <Tabs>
+      <Tab title="Node.js">
+        ```bash
+        npm install @acme/sdk
+        ```
+      </Tab>
+      <Tab title="Python">
+        ```bash
+        pip install acme-sdk
+        ```
+      </Tab>
+      <Tab title="Go">
+        ```bash
+        go get github.com/acme/sdk-go
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+  <Step title="Make Your First Request">
+    Initialize the client and make a test API call:
+
+    <Tabs>
+      <Tab title="Node.js">
+        ```javascript
+        import { AcmeClient } from '@acme/sdk';
+
+        const client = new AcmeClient({
+          apiKey: process.env.ACME_API_KEY,
+        });
+
+        const users = await client.users.list();
+        console.log(users);
+        ```
+      </Tab>
+      <Tab title="Python">
+        ```python
+        from acme import AcmeClient
+
+        client = AcmeClient(api_key=os.environ["ACME_API_KEY"])
+
+        users = client.users.list()
+        print(users)
+        ```
+      </Tab>
+    </Tabs>
+
+    You should see a response like:
+
+    ```json
+    {
+      "data": [],
+      "has_more": false,
+      "total": 0
+    }
+    ```
+  </Step>
+</Steps>
+
+## Next Steps
+
+Now that you've made your first API call, explore these resources:
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/authentication">
+    Learn about API key management and OAuth flows.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/users">
+    Browse the complete API reference.
+  </Card>
+</CardGroup>

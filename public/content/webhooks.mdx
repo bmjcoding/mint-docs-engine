@@ -1,0 +1,133 @@
+---
+title: Webhooks
+description: Set up real-time event notifications for your application.
+icon: webhook
+---
+
+Webhooks let you receive real-time HTTP notifications when events happen in your Acme project. Instead of polling the API, you can subscribe to events and get pushed updates instantly.
+
+## How Webhooks Work
+
+When an event occurs (e.g., a user is created), Acme sends an HTTP POST request to your configured endpoint with the event data.
+
+```json
+{
+  "id": "evt_1234567890",
+  "type": "user.created",
+  "created_at": "2026-03-21T14:30:00Z",
+  "data": {
+    "id": "usr_abc123",
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "created_at": "2026-03-21T14:30:00Z"
+  }
+}
+```
+
+## Setting Up Webhooks
+
+<Steps>
+  <Step title="Create an Endpoint">
+    Set up an HTTP endpoint on your server to receive webhook events:
+
+    ```javascript
+    app.post('/webhooks/acme', (req, res) => {
+      const event = req.body;
+      
+      switch (event.type) {
+        case 'user.created':
+          handleUserCreated(event.data);
+          break;
+        case 'project.updated':
+          handleProjectUpdated(event.data);
+          break;
+      }
+      
+      res.status(200).json({ received: true });
+    });
+    ```
+  </Step>
+  <Step title="Register the Webhook">
+    Use the API to register your endpoint:
+
+    ```bash
+    curl -X POST https://api.acme.com/v1/webhooks \
+      -H "Authorization: Bearer sk_live_abc123" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "url": "https://yourapp.com/webhooks/acme",
+        "events": ["user.created", "user.updated", "project.created"]
+      }'
+    ```
+  </Step>
+  <Step title="Verify Signatures">
+    Always verify webhook signatures to ensure requests are from Acme:
+
+    ```javascript
+    import crypto from 'crypto';
+
+    function verifyWebhookSignature(payload, signature, secret) {
+      const expected = crypto
+        .createHmac('sha256', secret)
+        .update(payload)
+        .digest('hex');
+      
+      return crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expected)
+      );
+    }
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+  Always verify webhook signatures before processing events. Without verification, an attacker could send fake events to your endpoint.
+</Warning>
+
+## Event Types
+
+<Accordion title="User Events">
+  - `user.created` — A new user was created
+  - `user.updated` — A user's profile was updated
+  - `user.deleted` — A user was deleted
+</Accordion>
+
+<Accordion title="Project Events">
+  - `project.created` — A new project was created
+  - `project.updated` — A project was updated
+  - `project.archived` — A project was archived
+</Accordion>
+
+<Accordion title="Billing Events">
+  - `invoice.created` — A new invoice was generated
+  - `invoice.paid` — An invoice was paid
+  - `subscription.updated` — A subscription plan changed
+</Accordion>
+
+## Retry Policy
+
+If your endpoint returns a non-2xx status code, Acme will retry the delivery:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | 1 minute |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+| 4th retry | 2 hours |
+| 5th retry | 24 hours |
+
+<Info>
+  After 5 failed attempts, the webhook event is marked as failed. You can manually retry failed events from the dashboard.
+</Info>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Respond Quickly" icon="zap">
+    Return a 200 response immediately, then process the event asynchronously using a message queue.
+  </Card>
+  <Card title="Handle Duplicates" icon="copy">
+    Use the event `id` field to deduplicate events, as the same event may be delivered more than once.
+  </Card>
+</CardGroup>
