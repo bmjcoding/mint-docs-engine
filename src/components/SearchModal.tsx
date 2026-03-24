@@ -19,17 +19,27 @@ interface SearchModalProps {
 
 function getAllPages(config: DocsConfig): SearchResult[] {
   const results: SearchResult[] = [];
-  for (const tab of config.navigation.tabs) {
-    for (const group of tab.groups) {
-      for (const pageSlug of group.pages) {
+  
+  function processPages(pages: any[], tabTitle: string, groupTitle: string) {
+    for (const item of pages) {
+      if (typeof item === 'string') {
+        const pageSlug = item;
         const name = pageSlug.split('/').pop()?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || pageSlug;
         results.push({
           slug: pageSlug,
           title: name,
-          group: group.group,
-          tab: tab.tab,
+          group: groupTitle,
+          tab: tabTitle,
         });
+      } else {
+        processPages(item.pages, tabTitle, item.group);
       }
+    }
+  }
+
+  for (const tab of config.navigation.tabs) {
+    for (const group of tab.groups) {
+      processPages(group.pages, tab.tab, group.group);
     }
   }
   return results;

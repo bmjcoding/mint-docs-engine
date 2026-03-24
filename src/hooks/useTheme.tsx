@@ -16,7 +16,16 @@ function getSystemTheme(): 'light' | 'dark' {
 }
 
 export function ThemeProvider({ children, defaultTheme = 'system' }: { children: ReactNode; defaultTheme?: ThemeMode }) {
-  const [theme, setThemeState] = useState<ThemeMode>(defaultTheme);
+  const [theme, setThemeState] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return (localStorage.getItem('theme') as ThemeMode) || defaultTheme;
+      } catch (e) {
+        return defaultTheme;
+      }
+    }
+    return defaultTheme;
+  });
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme);
 
   const resolvedTheme = theme === 'system' ? systemTheme : theme;
@@ -32,10 +41,15 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: { children:
     const root = document.documentElement;
     if (resolvedTheme === 'dark') {
       root.classList.add('dark');
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
+      root.style.colorScheme = 'light';
     }
-  }, [resolvedTheme]);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {}
+  }, [resolvedTheme, theme]);
 
   const setTheme = useCallback((t: ThemeMode) => {
     setThemeState(t);

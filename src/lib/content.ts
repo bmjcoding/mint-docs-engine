@@ -19,22 +19,24 @@ function getContentFromModules(slug: string): string | null {
 }
 
 export async function loadPage(slug: string): Promise<PageData | null> {
-  if (pageCache.has(slug)) {
-    return pageCache.get(slug)!;
-  }
+  // if (pageCache.has(slug)) {
+  //   return pageCache.get(slug)!;
+  // }
 
-  // First try embedded content (works in production)
-  const embedded = getContentFromModules(slug);
-  if (embedded) {
-    const { frontmatter, content } = parseFrontmatter(embedded);
-    const page: PageData = { slug, frontmatter, content, rawContent: embedded };
-    pageCache.set(slug, page);
-    return page;
+  // First try embedded content (disabled in dev to prevent Vite eager caching)
+  if (import.meta.env?.PROD) {
+    const embedded = getContentFromModules(slug);
+    if (embedded) {
+      const { frontmatter, content } = parseFrontmatter(embedded);
+      const page: PageData = { slug, frontmatter, content, rawContent: embedded };
+      // pageCache.set(slug, page); // Removed as per diff
+      return page;
+    }
   }
 
   // Fallback to fetch (works in dev)
   try {
-    const res = await fetch(`./content/${slug}.mdx`);
+    const res = await fetch(`./content/${slug}.mdx?t=${Date.now()}`);
     if (!res.ok) return null;
     const rawContent = await res.text();
     const { frontmatter, content } = parseFrontmatter(rawContent);
@@ -97,37 +99,59 @@ export function extractToc(content: string): TocItem[] {
   return items;
 }
 
-export function getAllPageSlugs(config: { navigation: { tabs: Array<{ groups: Array<{ pages: string[] }> }> } }): string[] {
+import type { DocsConfig, NavGroup } from './types';
+
+export function hasPage(pages: (string | NavGroup)[], slug: string): boolean {
+  for (const item of pages) {
+    if (typeof item === 'string') {
+      if (item === slug) return true;
+    } else if (item.pages) {
+      if (hasPage(item.pages, slug)) return true;
+    }
+  }
+  return false;
+}
+
+export function getAllPageSlugs(config: DocsConfig): string[] {
   const slugs: string[] = [];
+  
+  function extractSlugs(pages: (string | NavGroup)[]) {
+    for (const item of pages) {
+      if (typeof item === 'string') {
+        slugs.push(item);
+      } else if (item.pages) {
+        extractSlugs(item.pages);
+      }
+    }
+  }
+
   for (const tab of config.navigation.tabs) {
     for (const group of tab.groups) {
-      for (const page of group.pages) {
-        slugs.push(page);
-      }
+      extractSlugs(group.pages);
     }
   }
   return slugs;
 }
 
 export function getAdjacentPages(
-  config: { navigation: { tabs: Array<{ groups: Array<{ pages: string[] }> }> } },
+  config: DocsConfig,
   currentSlug: string
 ): { prev: string | null; next: string | null } {
   const allSlugs = getAllPageSlugs(config);
   const idx = allSlugs.indexOf(currentSlug);
   return {
     prev: idx > 0 ? allSlugs[idx - 1] : null,
-    next: idx < allSlugs.length - 1 ? allSlugs[idx + 1] : null,
+    next: idx !== -1 && idx < allSlugs.length - 1 ? allSlugs[idx + 1] : null,
   };
 }
 
 export function getBreadcrumbs(
-  config: { navigation: { tabs: Array<{ tab: string; groups: Array<{ group: string; pages: string[] }> }> } },
+  config: DocsConfig,
   currentSlug: string
 ): Array<{ label: string; slug?: string }> {
   for (const tab of config.navigation.tabs) {
     for (const group of tab.groups) {
-      if (group.pages.includes(currentSlug)) {
+      if (hasPage(group.pages, currentSlug)) {
         return [
           { label: tab.tab },
           { label: group.group },

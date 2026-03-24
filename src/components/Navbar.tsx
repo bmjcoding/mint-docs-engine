@@ -28,7 +28,7 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
   return (
     <div
       id="navbar"
-      className="z-30 fixed lg:sticky top-0 w-full"
+      className="z-50 fixed lg:sticky top-0 w-full"
     >
       {/* Blur background layer */}
       <div
@@ -41,38 +41,43 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
       />
 
       {/* Content */}
-      <div className="z-10 mx-auto relative">
-        <div className="relative">
+      <div className="z-10 relative">
+        <div className="relative z-10 border-b border-gray-200/50 dark:border-white/5 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
           {/* Main row */}
-          <div className="flex items-center lg:px-7 h-14 min-w-0 mx-4 lg:mx-0">
-            {/* Logo + tabs left */}
+          <div className="flex items-center px-4 lg:px-8 h-14 max-w-[100rem] mx-auto w-full">
+            {/* Logo left */}
             <div className="h-full relative flex-1 flex items-center gap-x-4 min-w-0 lg:border-none">
-              <div className="flex-1 flex items-center gap-x-4">
-                {/* Logo */}
-                <a href="#/" className="select-none flex-shrink-0">
-                    <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded bg-primary flex items-center justify-center text-white text-xs font-bold">
-                      {config.name.charAt(0)}
-                    </div>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100 text-base">{config.name}</span>
+              <a href={typeof config.logo === 'object' && config.logo?.href ? config.logo.href : '#/'} className="select-none flex-shrink-0">
+                {config.logo ? (
+                  typeof config.logo === 'string' ? (
+                    <img src={config.logo} alt={config.name} className="h-6" />
+                  ) : (
+                    <>
+                      {config.logo.light && <img src={config.logo.light} alt={config.name} className="h-6 dark:hidden" />}
+                      {config.logo.dark && <img src={config.logo.dark} alt={config.name} className="h-6 hidden dark:block" />}
+                      {(!config.logo.light && !config.logo.dark) && (
+                        <span className="font-semibold text-gray-900 dark:text-gray-100 text-[17px] tracking-tight">{config.name}</span>
+                      )}
+                    </>
+                  )
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100 text-[17px] tracking-tight">{config.name}</span>
                   </div>
-                </a>
-
-                {/* Spacer */}
-                <div className="flex-1" />
-              </div>
+                )}
+              </a>
             </div>
 
             {/* Right side: search, links, theme */}
-            <div className="flex items-center gap-3 ml-4">
+            <div className="flex items-center gap-4 ml-4">
               {/* Search button */}
               <button
                 onClick={onSearchOpen}
-                className="hidden sm:flex items-center gap-2 h-9 rounded-xl px-3 text-sm text-gray-500 dark:text-gray-400 ring-1 ring-gray-400/30 dark:ring-gray-600/50 hover:ring-gray-400/60 dark:hover:ring-gray-500/60 transition-all bg-white/80 dark:bg-white/5 min-w-[180px]"
+                className="hidden sm:flex items-center gap-2 h-9 rounded-lg px-2 w-[240px] text-sm text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black/20"
               >
                 <Search className="w-4 h-4 flex-shrink-0" />
                 <span className="flex-1 text-left">{config.search?.prompt || 'Search...'}</span>
-                <kbd className="hidden md:inline-flex h-5 items-center gap-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-1.5 font-mono text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                <kbd className="hidden md:flex h-5 items-center justify-center rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-1.5 font-sans text-[10px] font-medium text-gray-400">
                   ⌘K
                 </kbd>
               </button>
@@ -87,33 +92,48 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
               </button>
 
               {/* Navbar links */}
-              {config.navbar?.links?.map((link, i) => (
+              {config.navbar?.links?.map((link, i) => {
+                const isExternal = link.url.startsWith('http');
+                return (
+                  <a
+                    key={i}
+                    href={link.url}
+                    target={isExternal ? "_blank" : "_self"}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className="hidden lg:flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                  >
+                    {link.label === 'GitHub' && <Github className="w-5 h-5" />}
+                    {link.label !== 'GitHub' && <span>{link.label}</span>}
+                  </a>
+                );
+              })}
+
+              {/* Navbar primary CTA */}
+              {config.navbar?.primary && (
                 <a
-                  key={i}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden lg:flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                  href={config.navbar.primary.href}
+                  target={config.navbar.primary.href.startsWith('http') ? "_blank" : "_self"}
+                  rel={config.navbar.primary.href.startsWith('http') ? "noopener noreferrer" : undefined}
+                  className="hidden md:flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold text-white bg-black dark:bg-white dark:text-black hover:opacity-80 transition-opacity shadow-sm border border-transparent dark:border-gray-300"
                 >
-                  {link.label === 'GitHub' && <Github className="w-5 h-5" />}
-                  {link.label !== 'GitHub' && <span>{link.label}</span>}
+                  {config.navbar.primary.label || 'Get Started'}
                 </a>
-              ))}
+              )}
 
               {/* Theme toggle */}
               <div className="relative">
                 <button
                   onClick={() => setThemeMenuOpen(!themeMenuOpen)}
-                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                   aria-label="Toggle theme"
                 >
-                  {resolvedTheme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                  {resolvedTheme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
                 </button>
 
                 {themeMenuOpen && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setThemeMenuOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-36 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg z-50 py-1">
+                    <div className="fixed inset-0 z-[90]" onClick={() => setThemeMenuOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-36 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl z-[100] py-1">
                       {[
                         { mode: 'light' as const, icon: Sun, label: 'Light' },
                         { mode: 'dark' as const, icon: Moon, label: 'Dark' },
@@ -123,8 +143,8 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
                           key={mode}
                           onClick={() => { setTheme(mode); setThemeMenuOpen(false); }}
                           className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors ${theme === mode
-                            ? 'text-primary dark:text-primary-light bg-primary/5'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                            ? 'text-black dark:text-white bg-gray-50 dark:bg-white/5'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200'
                           }`}
                         >
                           <Icon className="w-4 h-4" />
@@ -137,27 +157,31 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Nav tabs row */}
-          {tabs.length > 1 && (
-            <div className="nav-tabs h-full flex text-sm gap-x-6 px-4 lg:px-7 overflow-x-auto">
+        {/* Nav tabs row (Tier 2) */}
+        {tabs.length > 1 && (
+          <div className="w-full border-b border-gray-200/60 dark:border-white/10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md">
+            <div className="nav-tabs h-12 flex items-center text-[14px] font-sans gap-x-8 px-4 lg:px-8 max-w-[100rem] mx-auto overflow-x-auto">
               {tabs.map((tab, i) => (
                 <button
                   key={i}
                   onClick={() => onTabChange(i)}
-                  className={`nav-tabs-item group relative h-full gap-2 flex items-center font-medium py-2.5 whitespace-nowrap transition-colors ${i === activeTabIdx
-                    ? 'text-gray-800 dark:text-gray-200 faux-bold'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300'
+                  className={`relative h-full gap-2 flex items-center whitespace-nowrap transition-colors ${i === activeTabIdx
+                    ? 'text-gray-900 dark:text-white font-medium'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
                 >
                   {tab.tab}
                   {/* Active indicator */}
-                  <div className={`absolute bottom-0 h-[1.5px] w-full left-0 ${i === activeTabIdx ? 'bg-primary dark:bg-primary-light' : 'bg-transparent'}`} />
+                  {i === activeTabIdx && (
+                    <div className="absolute bottom-0 h-[2px] w-full left-0 bg-gray-900 dark:bg-white" />
+                  )}
                 </button>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
