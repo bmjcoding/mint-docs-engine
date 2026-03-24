@@ -1,14 +1,49 @@
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, useEffect, type ReactNode } from 'react';
+// Force Vite HMR reload
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 import rehypeRaw from 'rehype-raw';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import {
-  Callout, Card, CardGroup, CodeBlock, CodeGroup, Steps, Tabs, Accordion,
-  MermaidDiagram, Expandable, ParamField, ResponseField,
+  Callout, Card, CardGroup, Columns, Column, CodeBlock, CodeGroup, Steps, Tabs, Accordion,
+  Mermaid, Expandable, ParamField, ResponseField,
+  Badge, Panel, RequestExample, ResponseExample,
+  Update, Prompt, Tree, TreeFolder, TreeFile, Tile, Color, ColorRow, ColorItem, Tooltip
 } from './MdxComponents';
 
 interface MarkdownRendererProps {
   content: string;
+}
+
+const MOCK_USER = {
+  firstName: "Jane",
+  company: "Acme Corp",
+  plan: "Enterprise",
+  org: { plan: "enterprise" }
+};
+
+function processSyncFeatures(content: string) {
+  let finalContent = content;
+  // Variables
+  finalContent = finalContent.replace(/\{user\.([a-zA-Z.]+)\??\}/g, (match, path) => {
+    const parts = path.split('.');
+    let val: any = MOCK_USER;
+    for (const p of parts) { val = val?.[p]; }
+    return val !== undefined ? String(val) : match;
+  });
+  // Conditionals
+  const conditionalRegex = /\{\s*(user\.[^?]+)\?\s*<>\s*(.*?)\s*<\/>\s*:\s*<>\s*(.*?)\s*<\/>\s*\}/g;
+  finalContent = finalContent.replace(conditionalRegex, (match, condition, trueStr, falseStr) => {
+     try {
+       // Only allow evaluating user context securely
+       const fn = new Function('user', `return ${condition};`);
+       const result = fn(MOCK_USER);
+       return result ? trueStr : falseStr;
+     } catch(e) { return match; }
+  });
+  return finalContent;
 }
 
 interface ParsedBlock {
@@ -24,17 +59,20 @@ function parseCustomComponents(content: string): ParsedBlock[] {
   let remaining = content;
 
   const componentTags = [
-    'Note', 'Warning', 'Info', 'Tip', 'Check', 'Danger',
-    'Card', 'CardGroup',
+    'Note', 'Warning', 'Info', 'Tip', 'Check', 'Danger', 'Callout',
+    'Card', 'CardGroup', 'Columns', 'Column',
     'CodeGroup',
     'Steps', 'Step',
     'Tabs', 'Tab',
     'Accordion', 'AccordionGroup',
     'Expandable', 'ParamField', 'ResponseField',
+    'Panel', 'RequestExample', 'ResponseExample',
+    'Badge', 'Tooltip', 'Mermaid',
+    'Update', 'Prompt', 'Tree', 'Tree\\.Folder', 'TreeFolder', 'Tree\\.File', 'TreeFile', 'Tile', 'Color', 'Color\\.Row', 'ColorRow', 'Color\\.Item', 'ColorItem'
   ];
 
   const tagPattern = new RegExp(
-    `<(${componentTags.join('|')})(\\s[^>]*)?>([\\s\\S]*?)</\\1>`,
+    `<(${componentTags.join('|')})(\\s[^>]*)?(?:/>|>([\\s\\S]*?)</\\1>)`,
     'g'
   );
 
@@ -55,7 +93,7 @@ function parseCustomComponents(content: string): ParsedBlock[] {
 
     const tag = match[1];
     const attrs = match[2] || '';
-    const inner = match[3];
+    const inner = match[3] || '';
 
     const props: Record<string, string> = {};
     const attrRegex = /(\w+)=(?:"([^"]*)"|{([^}]*)}|'([^']*)')/g;
@@ -185,6 +223,52 @@ function RenderBlock({ block }: { block: ParsedBlock }) {
       return <Callout type="check"><MarkdownRenderer content={content} /></Callout>;
     case 'Danger':
       return <Callout type="danger"><MarkdownRenderer content={content} /></Callout>;
+    case 'Callout':
+      return <Callout type={props.type as any} title={props.title} icon={props.icon} color={props.color}><MarkdownRenderer content={content} /></Callout>;
+    case 'Badge':
+      return <Badge color={props.color as any} size={props.size as any} shape={props.shape as any} stroke={props.stroke === 'true'} disabled={props.disabled === 'true'} icon={props.icon}><MarkdownRenderer content={content} /></Badge>;
+    case 'Tooltip':
+      return <Tooltip tip={props.tip || ''}><MarkdownRenderer content={content} /></Tooltip>;
+    case 'Mermaid':
+      return <Mermaid chart={props.chart || ''} />;
+    case 'Columns':
+      return <Columns cols={parseInt(props.cols || '2', 10)}><MarkdownRenderer content={content} /></Columns>;
+    case 'Column':
+      return <Column><MarkdownRenderer content={content} /></Column>;
+    case 'Panel':
+      return <Panel><MarkdownRenderer content={content} /></Panel>;
+    case 'RequestExample':
+      return <RequestExample><MarkdownRenderer content={content} /></RequestExample>;
+    case 'ResponseExample':
+      return <ResponseExample><MarkdownRenderer content={content} /></ResponseExample>;
+    case 'Update': {
+      let parsedTags: string[] = [];
+      if (props.tags) {
+        // Simple manual parsing of `["A", "B"]` style strings returned by regex
+        parsedTags = props.tags.replace(/[[\]"]/g, '').split(',').map(s => s.trim()).filter(Boolean);
+      }
+      return <Update label={props.label || ''} description={props.description} tags={parsedTags}><MarkdownRenderer content={content} /></Update>;
+    }
+    case 'Prompt':
+      return <Prompt prompt={props.prompt || ''} response={props.response || ''} />;
+    case 'Tree':
+      return <Tree><MarkdownRenderer content={content} /></Tree>;
+    case 'Tree.Folder':
+    case 'TreeFolder':
+      return <TreeFolder name={props.name || ''} defaultOpen={props.defaultOpen === 'true'}><MarkdownRenderer content={content} /></TreeFolder>;
+    case 'Tree.File':
+    case 'TreeFile':
+      return <TreeFile name={props.name || ''} />;
+    case 'Tile':
+      return <Tile title={props.title || ''} description={props.description || ''} icon={props.icon} href={props.href} />;
+    case 'Color':
+      return <Color hex={props.hex || ''} name={props.name} />;
+    case 'Color.Row':
+    case 'ColorRow':
+      return <ColorRow><MarkdownRenderer content={content} /></ColorRow>;
+    case 'Color.Item':
+    case 'ColorItem':
+      return <ColorItem hex={props.hex || ''} name={props.name} />;
 
     case 'CodeGroup': {
       const codeTabs = extractCodeGroupTabs(content);
@@ -199,7 +283,7 @@ function RenderBlock({ block }: { block: ParsedBlock }) {
 
     case 'Card':
       return (
-        <Card title={props.title || ''} icon={props.icon} href={props.href}>
+        <Card title={props.title || ''} icon={props.icon} href={props.href} horizontal={props.horizontal === 'true'} img={props.img} cta={props.cta} arrow={props.arrow === 'true'}>
           <span>{content.trim()}</span>
         </Card>
       );
@@ -289,8 +373,8 @@ function HeadingWithAnchor({ level, children, ...props }: { level: 2 | 3; childr
 function MarkdownBlock({ content }: { content: string }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeRaw]}
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeRaw, rehypeKatex]}
       components={{
         h2: ({ children, ...props }) => <HeadingWithAnchor level={2} {...props}>{children}</HeadingWithAnchor>,
         h3: ({ children, ...props }) => <HeadingWithAnchor level={3} {...props}>{children}</HeadingWithAnchor>,
@@ -304,7 +388,7 @@ function MarkdownBlock({ content }: { content: string }) {
             const codeText = typeof children === 'string' ? children : String(children || '');
             const trimmed = codeText.replace(/\n$/, '');
             if (language === 'mermaid') {
-              return <MermaidDiagram chart={trimmed} />;
+              return <Mermaid chart={trimmed} />;
             }
             return <CodeBlock code={trimmed} language={language} />;
           }
@@ -317,6 +401,38 @@ function MarkdownBlock({ content }: { content: string }) {
             </table>
           </div>
         ),
+        img: ({ className, src, alt, ...props }) => {
+          // If the user specifies width via style or it's forced by className, we keep it, otherwise max-w-full.
+          const hasNoZoom = ('noZoom' in props) || ('nozoom' in props);
+          const userClass = className || (props as any).className || (props as any).class || '';
+          return (
+            <img 
+              src={src} 
+              alt={alt} 
+              className={`max-w-full h-auto rounded-xl ${hasNoZoom ? '' : 'cursor-zoom-in'} ${userClass}`} 
+              {...(props as any)} 
+            />
+          );
+        },
+        iframe: ({ className, ...props }) => {
+          const userClass = className || (props as any).className || (props as any).class || '';
+          return (
+            <iframe 
+              className={`w-full aspect-video rounded-xl ${userClass}`} 
+              allowFullScreen 
+              {...(props as any)} 
+            />
+          );
+        },
+        video: ({ className, ...props }) => {
+          const userClass = className || (props as any).className || (props as any).class || '';
+          return (
+            <video 
+              className={`w-full aspect-video rounded-xl ${userClass}`} 
+              {...(props as any)} 
+            />
+          );
+        },
       }}
     >
       {content}
@@ -335,7 +451,89 @@ function extractText(node: ReactNode): string {
 }
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
-  const blocks = useMemo(() => parseCustomComponents(content), [content]);
+  const [processedContent, setProcessedContent] = useState(() => processSyncFeatures(content));
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const syncContent = processSyncFeatures(content);
+    
+    // Support import MySnippet from "/snippets/my-snippet.mdx";
+    // or import { MyJSXSnippet } from "/components/my-jsx-snippet.jsx";
+    const importRegex = /import\s+(?:{\s*([^}]+)\s*}|(\w+))\s+from\s+["']([^"']+)["'];?/g;
+    const matches = Array.from(syncContent.matchAll(importRegex));
+
+    if (matches.length > 0) {
+      setIsLoading(true);
+      
+      async function fetchSnippets() {
+        let finalContent = syncContent;
+        const snippetMap: Record<string, string> = {};
+
+        for (const match of matches) {
+           const compName = match[1] || match[2];
+           const importPath = match[3];
+
+           try {
+             // In local environment, fetch from public folder. E.g., "/content/snippets/..."
+             const res = await fetch(importPath);
+             if (res.ok) {
+               let text = await res.text();
+               // Strip frontmatter
+               text = text.replace(/^---[\s\S]*?---/, '').trim();
+               // If it's a JSX component export, attempt a quick regex extraction (very rudimental for demo)
+               if (importPath.endsWith('.jsx')) {
+                 const returnMatch = text.match(/return\s*\(\s*([\s\S]*?)\s*\);/);
+                 if (returnMatch) {
+                   text = returnMatch[1];
+                 }
+               }
+               snippetMap[compName.trim()] = text;
+             }
+           } catch(e) { console.warn("Failed to fetch snippet", importPath); }
+        }
+
+        // Remove import lines
+        finalContent = finalContent.replace(importRegex, '');
+
+        // Resolve instances of `<SnippetName />`
+        for (const [compName, snippetText] of Object.entries(snippetMap)) {
+          const tagRegex = new RegExp(`<${compName}\\s*([^>]*)/>`, 'g');
+          finalContent = finalContent.replace(tagRegex, (m, attrs) => {
+             const props: Record<string, string> = {};
+             const attrRegex = /(\w+)=(?:"([^"]*)"|'([^']*)')/g;
+             let am;
+             while ((am = attrRegex.exec(attrs)) !== null) {
+                props[am[1]] = am[2] || am[3] || '';
+             }
+             
+             let replacedSnippet = snippetText;
+             for (const [k, v] of Object.entries(props)) {
+                replacedSnippet = replacedSnippet.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+             }
+             return replacedSnippet;
+          });
+        }
+
+        if (isMounted) {
+           setProcessedContent(finalContent);
+           setIsLoading(false);
+        }
+      }
+      fetchSnippets();
+    } else {
+      setProcessedContent(syncContent);
+      setIsLoading(false);
+    }
+    
+    return () => { isMounted = false; };
+  }, [content]);
+
+  const blocks = useMemo(() => parseCustomComponents(processedContent), [processedContent]);
+
+  if (isLoading) {
+    return <div className="w-full flex justify-center py-20 animate-pulse text-gray-400">Loading snippets...</div>;
+  }
 
   return (
     <>

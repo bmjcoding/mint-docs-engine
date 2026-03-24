@@ -36,8 +36,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
   return (
     <div
       id="content-side-layout"
-      className="hidden xl:flex self-start sticky xl:flex-col max-w-[28rem] z-[21] h-[calc(100vh-8rem)]"
-      style={{ top: 'calc(6.5rem)' }}
+      className="hidden xl:flex self-start sticky xl:flex-col max-w-[28rem] z-[21] h-[calc(100vh-8rem)] top-[calc(6.5rem)]"
     >
       <div
         id="table-of-contents-layout"
@@ -45,7 +44,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
       >
         <div
           id="table-of-contents"
-          className="text-gray-600 text-sm leading-6 w-[16.5rem] overflow-y-auto space-y-2 pb-4 -mt-10 pt-10"
+          className="text-gray-600 text-sm leading-6 w-[16.5rem] overflow-y-auto space-y-2 pb-4 pt-2"
         >
           {/* Header */}
           <button className="text-gray-700 dark:text-gray-300 font-medium flex items-center space-x-2 hover:text-gray-900 dark:hover:text-gray-100 transition-colors cursor-pointer">

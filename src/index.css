@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: oklch(0.63 0.17 220);
   --color-primary-light: oklch(0.72 0.17 220);
   --color-primary-dark: oklch(0.52 0.17 220);
 
-  --color-background-light: #ffffff;
-  --color-background-dark: #0d0d0f;
+  --color-background-light: #fdfcfb;
+  --color-background-dark: #0b0f19;
   --color-codeblock: #1a1a1e;
+  
+  --font-serif: "Playfair Display", "Merriweather", ui-serif, Georgia, serif;
 
   --color-gray-50: #f6f6f6;
   --color-gray-100: #f1f1f1;
@@ -44,7 +48,6 @@ body.dark {
 
 html.dark {
   background-color: var(--color-background-dark);
-  color-scheme: dark;
 }
 
 /* Prose overrides for Mintlify-like typography */
@@ -90,16 +93,22 @@ html.dark {
 }
 
 .prose a {
-  color: var(--tw-prose-links);
+  color: inherit;
+  font-weight: 500;
   text-decoration: underline;
-  text-decoration-color: transparent;
-  transition: text-decoration-color 0.15s;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-gray-300);
+  transition: text-decoration-color 0.15s, color 0.15s;
 }
 
-.prose a:hover {
+.dark .prose a {
+  text-decoration-color: var(--color-gray-700);
+}
+
+.prose a:hover, .dark .prose a:hover {
   text-decoration-color: currentColor;
 }
-
 .prose strong {
   color: var(--tw-prose-bold);
   font-weight: 600;
@@ -269,15 +278,20 @@ details summary {
   content: none;
 }
 
-/* Shiki dual-theme: light theme by default, dark theme in dark mode */
-.shiki-wrapper .shiki,
-.shiki-wrapper .shiki span {
-  color: var(--shiki-light) !important;
-  font-style: var(--shiki-light-font-style) !important;
+/* Hide the timeline line on the last Update entry in a sequence */
+.update:not(:has(~ .update)) .last-update-line {
+  display: none;
 }
 
-html.dark .shiki-wrapper .shiki,
-html.dark .shiki-wrapper .shiki span {
+/* Shiki theme-aware colors */
+.dark .shiki-wrapper .shiki,
+.dark .shiki-wrapper .shiki span {
   color: var(--shiki-dark) !important;
   font-style: var(--shiki-dark-font-style) !important;
+  background-color: transparent !important;
+}
+
+.shiki-wrapper .shiki,
+.shiki-wrapper .shiki span {
+  background-color: transparent !important;
 }
