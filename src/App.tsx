@@ -224,7 +224,7 @@ export default function App() {
           id="content-area"
           className="relative grow box-border flex-col w-full mx-auto px-1 lg:pl-[23.7rem] lg:-ml-12 xl:w-[calc(100%-28rem)]"
         >
-          <div className="pt-[var(--navbar-height)] lg:pt-8 w-full max-w-4xl mx-auto px-4 sm:px-8 xl:px-12 flex-1">
+          <div className="pt-[calc(var(--navbar-height)+1.75rem)] lg:pt-8 w-full max-w-4xl mx-auto px-4 sm:px-8 xl:px-12 flex-1">
 
             {pageData ? (
               <>
