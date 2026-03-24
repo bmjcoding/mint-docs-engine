@@ -106,7 +106,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       {mobileOpen && (
         <>
           <div className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={onMobileClose} />
-          <div className="lg:hidden fixed top-14 left-0 bottom-0 z-50 w-[18rem] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-gray-800">
+          <div className="lg:hidden fixed left-0 bottom-0 z-50 w-[18rem] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-gray-800" style={{ top: 'var(--navbar-height, 56px)' }}>
             <div className="p-4">
               {sidebarContent}
             </div>
