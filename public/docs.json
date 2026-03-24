@@ -18,9 +18,6 @@
     "tabs": [
       {
         "tab": "Documentation",
-        "anchors": [
-          { "title": "Dashboard", "url": "https://dashboard.mintlify.com", "icon": "layout" }
-        ],
         "groups": [
           {
             "group": "Get Started",
