@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react';
 import { useDocsConfig } from '@/hooks/useDocsConfig';
 import { useTheme } from '@/hooks/useTheme';
 import { Search, Sun, Moon, Monitor, Github } from 'lucide-react';
+import type { NavAnchor } from '@/lib/types';
+import Icon from '@/components/Icon';
 
 interface NavbarProps {
   activeTabIdx: number;
   onTabChange: (idx: number) => void;
   onSearchOpen: () => void;
+  anchors?: NavAnchor[];
 }
 
-export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: NavbarProps) {
+export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, anchors }: NavbarProps) {
   const config = useDocsConfig();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [isOpaque, setIsOpaque] = useState(false);
@@ -178,6 +181,27 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
                     <div className="absolute bottom-0 h-[2px] w-full left-0 bg-gray-900 dark:bg-white" />
                   )}
                 </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Anchors row (below tabs, aligned with sidebar) */}
+        {anchors && anchors.length > 0 && (
+          <div className="hidden lg:block w-full border-b border-gray-200/60 dark:border-white/10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md">
+            <div className="flex items-center gap-4 h-11 px-4 lg:px-8 w-[18rem]">
+              {anchors.map((anchor, idx) => (
+                <a
+                  key={idx}
+                  href={anchor.url}
+                  target={anchor.url.startsWith('http') ? '_blank' : '_self'}
+                  rel={anchor.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors whitespace-nowrap"
+                  style={anchor.color ? { color: anchor.color } : {}}
+                >
+                  {anchor.icon && <Icon name={anchor.icon} className="w-4 h-4 opacity-80" />}
+                  <span>{anchor.title}</span>
+                </a>
               ))}
             </div>
           </div>

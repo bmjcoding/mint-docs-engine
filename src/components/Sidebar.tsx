@@ -69,28 +69,6 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       {/* Gradient mask at top */}
       <div className="sticky top-0 h-8 z-10 bg-gradient-to-b from-background-light dark:from-background-dark" />
 
-      {/* Global Anchors */}
-      {tab.anchors && tab.anchors.length > 0 && (
-        <div className="mb-6 lg:mb-8 pb-4 border-b border-gray-200 dark:border-gray-800">
-          <ul className="space-y-1">
-            {tab.anchors.map((anchor, idx) => (
-              <li key={idx}>
-                <a 
-                  href={anchor.url} 
-                  target="_self"
-                  className="flex items-center gap-3 px-4 py-1.5 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors font-medium rounded-xl hover:bg-gray-600/5 dark:hover:bg-gray-200/5"
-                  style={anchor.color ? { color: anchor.color } : {}}
-                >
-                  {anchor.icon && <span className="text-lg w-5 h-5 flex items-center justify-center opacity-80"><Icon name={anchor.icon} className="w-5 h-5" /></span>}
-                  {!anchor.icon && <span className="w-5 h-5 flex items-center justify-center text-gray-400 opacity-80"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></span>}
-                  <span>{anchor.title}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <div id="navigation-items">
         {tab.groups.map((group, gi) => (
           <div key={gi} className={gi > 0 ? 'mt-6 lg:mt-8' : ''}>
