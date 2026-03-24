@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDocsConfig } from '@/hooks/useDocsConfig';
 import { useTheme } from '@/hooks/useTheme';
-import { Search, Sun, Moon, Monitor, Github, ExternalLink } from 'lucide-react';
+import { Search, Sun, Moon, Monitor, Github, ExternalLink, Menu } from 'lucide-react';
 import type { NavAnchor } from '@/lib/types';
 
 interface NavbarProps {
   activeTabIdx: number;
   onTabChange: (idx: number) => void;
   onSearchOpen: () => void;
+  onMobileMenuOpen?: () => void;
   anchors?: NavAnchor[];
 }
 
-export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, anchors }: NavbarProps) {
+export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobileMenuOpen, anchors }: NavbarProps) {
   const config = useDocsConfig();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [isOpaque, setIsOpaque] = useState(false);
@@ -79,6 +80,15 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, anchor
                 <span className="font-semibold text-gray-900 dark:text-gray-100 text-[17px] tracking-tight">{config.name}</span>
               )}
             </a>
+
+            {/* Mobile hamburger — visible only < lg */}
+            <button
+              onClick={onMobileMenuOpen}
+              className="lg:hidden p-2 -ml-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
 
             {/* Spacer */}
             <div className="flex-1" />

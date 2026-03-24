@@ -8,7 +8,7 @@ import SearchModal from '@/components/SearchModal';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { loadPage, extractToc, getAdjacentPages, hasPage } from '@/lib/content';
 import type { PageData, TocItem, Redirect } from '@/lib/types';
-import { Copy, Check, Menu } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 
 function getFirstSlug(pages: any[]): string {
   if (!pages || pages.length === 0) return '';
@@ -202,6 +202,7 @@ export default function App() {
         activeTabIdx={activeTabIdx}
         onTabChange={handleTabChange}
         onSearchOpen={() => setSearchOpen(true)}
+        onMobileMenuOpen={() => setMobileMenuOpen(true)}
         anchors={activeTab?.anchors}
       />
 
@@ -223,15 +224,7 @@ export default function App() {
           id="content-area"
           className="relative grow box-border flex-col w-full mx-auto px-1 lg:pl-[23.7rem] lg:-ml-12 xl:w-[calc(100%-28rem)]"
         >
-          <div className="pt-20 lg:pt-8 w-full max-w-4xl mx-auto px-4 sm:px-8 xl:px-12 flex-1">
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden mb-4 p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-              aria-label="Open menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+          <div className="pt-[var(--navbar-height)] lg:pt-8 w-full max-w-4xl mx-auto px-4 sm:px-8 xl:px-12 flex-1">
 
             {pageData ? (
               <>
