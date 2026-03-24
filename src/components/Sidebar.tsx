@@ -34,7 +34,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
                     : 'hover:bg-gray-600/5 dark:hover:bg-gray-200/5 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                   href={`#/${pageSlug}`}
-                  style={{ paddingLeft: '1rem' }}
+                  style={{ paddingLeft: '2rem' }}
                   onClick={(e) => {
                     e.preventDefault();
                     onNavigate(pageSlug);
@@ -51,7 +51,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
             // It's a nested NavGroup (dropdown/folder)
             return (
               <li key={`group-${level}-${idx}`} className="mt-2 mb-1">
-                <div className="flex items-center gap-2 pl-4 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2 pl-8 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
                   {item.icon && <span className="text-gray-400 dark:text-gray-500 w-4 h-4 shrink-0 flex items-center justify-center -ml-1 text-base"><Icon name={item.icon} className="w-4 h-4" /></span>}
                   <span>{item.group}</span>
                 </div>
@@ -69,34 +69,12 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       {/* Gradient mask at top */}
       <div className="sticky top-0 h-8 z-10 bg-gradient-to-b from-background-light dark:from-background-dark" />
 
-      {/* Global Anchors */}
-      {tab.anchors && tab.anchors.length > 0 && (
-        <div className="mb-6 lg:mb-8 pb-4 border-b border-gray-200 dark:border-gray-800">
-          <ul className="space-y-1">
-            {tab.anchors.map((anchor, idx) => (
-              <li key={idx}>
-                <a 
-                  href={anchor.url} 
-                  target="_self"
-                  className="flex items-center gap-3 px-4 py-1.5 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors font-medium rounded-xl hover:bg-gray-600/5 dark:hover:bg-gray-200/5"
-                  style={anchor.color ? { color: anchor.color } : {}}
-                >
-                  {anchor.icon && <span className="text-lg w-5 h-5 flex items-center justify-center opacity-80"><Icon name={anchor.icon} className="w-5 h-5" /></span>}
-                  {!anchor.icon && <span className="w-5 h-5 flex items-center justify-center text-gray-400 opacity-80"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></span>}
-                  <span>{anchor.title}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <div id="navigation-items">
         {tab.groups.map((group, gi) => (
           <div key={gi} className={gi > 0 ? 'mt-6 lg:mt-8' : ''}>
             {/* Group header */}
-            <div className="sidebar-group-header flex items-center gap-2.5 pl-4 mb-3.5 lg:mb-2.5 font-semibold text-gray-900 dark:text-gray-200">
-              {group.icon && <span className="text-gray-500 w-5 h-5 flex items-center justify-center text-lg"><Icon name={group.icon} className="w-5 h-5" /></span>}
+            <div className="sidebar-group-header flex items-center gap-2.5 pl-8 mb-3.5 lg:mb-2.5 font-semibold text-gray-900 dark:text-gray-200">
+              {group.icon && <span className="text-gray-500 w-5 h-5 flex items-center justify-center text-lg -ml-0.5"><Icon name={group.icon} className="w-5 h-5" /></span>}
               <h5 id={`sidebar-title-${gi}`}>{group.group}</h5>
             </div>
 
@@ -114,11 +92,11 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       <div
         id="sidebar"
         className="z-20 hidden lg:block fixed bottom-0 right-auto w-[18rem] left-0"
-        style={{ top: '5.75rem' }}
+        style={{ top: 'var(--navbar-height, 6.5rem)' }}
       >
         <div
           id="sidebar-content"
-          className="absolute inset-0 z-10 stable-scrollbar-gutter overflow-auto pl-4 pr-4 pb-10"
+          className="absolute inset-0 z-10 stable-scrollbar-gutter overflow-auto pr-4 pb-10"
         >
           {sidebarContent}
         </div>

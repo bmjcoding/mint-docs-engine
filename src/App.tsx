@@ -202,6 +202,7 @@ export default function App() {
         activeTabIdx={activeTabIdx}
         onTabChange={handleTabChange}
         onSearchOpen={() => setSearchOpen(true)}
+        anchors={activeTab?.anchors}
       />
 
       <div data-docs-theme="mint" className="max-lg:contents lg:flex lg:w-full">

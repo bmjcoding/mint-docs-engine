@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDocsConfig } from '@/hooks/useDocsConfig';
 import { useTheme } from '@/hooks/useTheme';
 import { Search, Sun, Moon, Monitor, Github } from 'lucide-react';
+import type { NavAnchor } from '@/lib/types';
 
 interface NavbarProps {
   activeTabIdx: number;
   onTabChange: (idx: number) => void;
   onSearchOpen: () => void;
+  anchors?: NavAnchor[];
 }
 
-export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: NavbarProps) {
+export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, anchors }: NavbarProps) {
   const config = useDocsConfig();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [isOpaque, setIsOpaque] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,10 +26,18 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (navRef.current) {
+      const height = navRef.current.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--navbar-height', `${height}px`);
+    }
+  }, [anchors]);
+
   const tabs = config.navigation.tabs;
 
   return (
     <div
+      ref={navRef}
       id="navbar"
       className="z-50 fixed lg:sticky top-0 w-full"
     >
@@ -178,6 +189,26 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen }: Navb
                     <div className="absolute bottom-0 h-[2px] w-full left-0 bg-gray-900 dark:bg-white" />
                   )}
                 </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Anchors row (below tabs, aligned with sidebar) */}
+        {anchors && anchors.length > 0 && (
+          <div className="hidden lg:block w-full border-b border-gray-200/60 dark:border-white/10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md">
+            <div className="flex items-center gap-4 h-11 px-4 lg:px-8 max-w-[100rem] mx-auto w-full">
+              {anchors.map((anchor, idx) => (
+                <a
+                  key={idx}
+                  href={anchor.url}
+                  target={anchor.url.startsWith('http') ? '_blank' : '_self'}
+                  rel={anchor.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors whitespace-nowrap"
+                  style={anchor.color ? { color: anchor.color } : {}}
+                >
+                  {anchor.title}
+                </a>
               ))}
             </div>
           </div>
