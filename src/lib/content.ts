@@ -3,12 +3,12 @@ import type { PageFrontmatter, PageData, TocItem } from './types';
 const pageCache = new Map<string, PageData>();
 
 // Import all content files at build time
-const contentModules = import.meta.glob('/public/content/**/*.mdx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const contentModules = import.meta.glob('/content/**/*.mdx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 function getContentFromModules(slug: string): string | null {
   // Try various path patterns
   const paths = [
-    `/public/content/${slug}.mdx`,
+    `/content/${slug}.mdx`,
   ];
   for (const path of paths) {
     if (contentModules[path]) {
