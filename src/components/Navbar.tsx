@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDocsConfig } from '@/hooks/useDocsConfig';
 import { useTheme } from '@/hooks/useTheme';
 import { Search, Sun, Moon, Monitor, Github } from 'lucide-react';
 import type { NavAnchor } from '@/lib/types';
-import Icon from '@/components/Icon';
 
 interface NavbarProps {
   activeTabIdx: number;
@@ -17,6 +16,7 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, anchor
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [isOpaque, setIsOpaque] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,10 +26,18 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, anchor
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (navRef.current) {
+      const height = navRef.current.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--navbar-height', `${height}px`);
+    }
+  }, [anchors]);
+
   const tabs = config.navigation.tabs;
 
   return (
     <div
+      ref={navRef}
       id="navbar"
       className="z-50 fixed lg:sticky top-0 w-full"
     >

@@ -34,7 +34,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
                     : 'hover:bg-gray-600/5 dark:hover:bg-gray-200/5 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                   href={`#/${pageSlug}`}
-                  style={{ paddingLeft: '1rem' }}
+                  style={{ paddingLeft: '2rem' }}
                   onClick={(e) => {
                     e.preventDefault();
                     onNavigate(pageSlug);
@@ -51,7 +51,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
             // It's a nested NavGroup (dropdown/folder)
             return (
               <li key={`group-${level}-${idx}`} className="mt-2 mb-1">
-                <div className="flex items-center gap-2 pl-4 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2 pl-8 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
                   {item.icon && <span className="text-gray-400 dark:text-gray-500 w-4 h-4 shrink-0 flex items-center justify-center -ml-1 text-base"><Icon name={item.icon} className="w-4 h-4" /></span>}
                   <span>{item.group}</span>
                 </div>
@@ -73,8 +73,8 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
         {tab.groups.map((group, gi) => (
           <div key={gi} className={gi > 0 ? 'mt-6 lg:mt-8' : ''}>
             {/* Group header */}
-            <div className="sidebar-group-header flex items-center gap-2.5 pl-4 mb-3.5 lg:mb-2.5 font-semibold text-gray-900 dark:text-gray-200">
-              {group.icon && <span className="text-gray-500 w-5 h-5 flex items-center justify-center text-lg"><Icon name={group.icon} className="w-5 h-5" /></span>}
+            <div className="sidebar-group-header flex items-center gap-2.5 pl-8 mb-3.5 lg:mb-2.5 font-semibold text-gray-900 dark:text-gray-200">
+              {group.icon && <span className="text-gray-500 w-5 h-5 flex items-center justify-center text-lg -ml-0.5"><Icon name={group.icon} className="w-5 h-5" /></span>}
               <h5 id={`sidebar-title-${gi}`}>{group.group}</h5>
             </div>
 
@@ -92,11 +92,11 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       <div
         id="sidebar"
         className="z-20 hidden lg:block fixed bottom-0 right-auto w-[18rem] left-0"
-        style={{ top: '5.75rem' }}
+        style={{ top: 'var(--navbar-height, 6.5rem)' }}
       >
         <div
           id="sidebar-content"
-          className="absolute inset-0 z-10 stable-scrollbar-gutter overflow-auto pl-4 pr-4 pb-10"
+          className="absolute inset-0 z-10 stable-scrollbar-gutter overflow-auto pr-4 pb-10"
         >
           {sidebarContent}
         </div>
