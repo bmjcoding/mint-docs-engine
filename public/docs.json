@@ -2,26 +2,42 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Acme Docs",
+  "redirects": [
+    { "source": "/beta/:slug*", "destination": "/v2/:slug*" }
+  ],
   "colors": {
     "primary": "#0ea5e9"
   },
   "logo": {
     "light": "/logo-light.svg",
-    "dark": "/logo-dark.svg"
+    "dark": "/logo-dark.svg",
+    "href": "https://mintlify.com"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
         "tab": "Documentation",
+        "anchors": [
+          { "title": "Dashboard", "url": "https://dashboard.mintlify.com", "icon": "layout" }
+        ],
         "groups": [
           {
             "group": "Get Started",
-            "pages": ["introduction", "quickstart"]
+            "icon": "rocket",
+            "pages": ["introduction", "quickstart", "all-components-test"]
           },
           {
             "group": "Guides",
-            "pages": ["authentication", "webhooks"]
+            "pages": [
+              "authentication",
+              "webhooks",
+              {
+                "group": "Advanced Guides",
+                "icon": "book-open",
+                "pages": ["api/users"]
+              }
+            ]
           }
         ]
       },
@@ -39,7 +55,12 @@
   "navbar": {
     "links": [
       { "label": "GitHub", "url": "https://github.com" }
-    ]
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Sign Up",
+      "href": "https://dashboard.mintlify.com"
+    }
   },
   "footer": {
     "socials": {

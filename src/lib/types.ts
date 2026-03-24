@@ -7,16 +7,25 @@ export interface DocsConfig {
     light?: string;
     dark?: string;
   };
-  logo?: {
+  logo?: string | {
+    light?: string;
+    dark?: string;
+    href?: string;
+  };
+  favicon?: string | {
     light?: string;
     dark?: string;
   };
-  favicon?: string;
   navigation: {
     tabs: NavTab[];
   };
   navbar?: {
     links?: NavbarLink[];
+    primary?: {
+      type: string;
+      label?: string;
+      href: string;
+    };
   };
   footer?: {
     socials?: Record<string, string>;
@@ -24,19 +33,38 @@ export interface DocsConfig {
   appearance?: {
     default?: 'light' | 'dark' | 'system';
   };
+  banner?: {
+    content: string;
+    dismissible?: boolean;
+  };
   search?: {
     prompt?: string;
   };
+  redirects?: Redirect[];
+}
+
+export interface Redirect {
+  source: string;
+  destination: string;
+}
+
+export interface NavAnchor {
+  icon?: string;
+  title: string;
+  url: string;
+  color?: string;
 }
 
 export interface NavTab {
   tab: string;
   groups: NavGroup[];
+  anchors?: NavAnchor[];
 }
 
 export interface NavGroup {
   group: string;
-  pages: string[];
+  pages: (string | NavGroup)[];
+  icon?: string;
 }
 
 export interface NavbarLink {

@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 import {
   AlertCircle, AlertTriangle, Info, Lightbulb, CheckCircle, XCircle,
-  ChevronRight, Copy, Check, Link as LinkIcon
+  ChevronRight, Copy, Check, Link as LinkIcon, Folder, File, Terminal
 } from 'lucide-react';
 import { highlight } from '@/lib/highlighter';
 import mermaid from 'mermaid';
+import Icon from '@/components/Icon';
 
 /* ─── Callout ─── */
 interface CalloutProps {
-  type: 'note' | 'warning' | 'info' | 'tip' | 'check' | 'danger';
+  type?: 'note' | 'warning' | 'info' | 'tip' | 'check' | 'danger';
   children: ReactNode;
   title?: string;
+  icon?: string | ReactNode;
+  color?: string;
 }
 
 const calloutConfig: Record<string, {
@@ -51,18 +54,39 @@ const calloutConfig: Record<string, {
   },
 };
 
-export function Callout({ type, children, title }: CalloutProps) {
-  const cfg = calloutConfig[type] || calloutConfig.info;
-  const Icon = cfg.icon;
+export function Callout({ type, children, title, icon, color }: CalloutProps) {
+  if (color || (icon && !type)) {
+    // Custom callout
+    return (
+      <div
+        className="callout my-4 px-5 py-4 overflow-hidden rounded-2xl flex gap-3 border"
+        style={{ borderColor: color, backgroundColor: color ? `${color}20` : undefined, color }}
+        data-callout-type="custom"
+      >
+        {icon && <div className="flex-none size-5 mt-0.5" style={{ color }}><Icon name={icon} className="w-5 h-5" /></div>}
+        <div
+          className="text-sm min-w-0 w-full mt-1 [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current"
+          data-component-part="callout-content"
+          style={{ color }}
+        >
+          {title && <p className="font-semibold mb-1">{title}</p>}
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  const cfg = calloutConfig[type || 'info'] || calloutConfig.info;
+  const IconComponent = cfg.icon;
 
   return (
     <div
       className={`callout my-4 px-5 py-4 overflow-hidden rounded-2xl flex gap-3 border ${cfg.border} ${cfg.bg} ${cfg.darkBorder} ${cfg.darkBg}`}
       data-callout-type={type}
     >
-      <Icon className={`flex-none ${cfg.iconSize} ${cfg.text} ${cfg.darkText} mt-0.5`} />
+      <IconComponent className={`flex-none ${cfg.iconSize} ${cfg.text} ${cfg.darkText} mt-0.5`} />
       <div
-        className={`text-sm min-w-0 w-full ${cfg.text} ${cfg.darkText} [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current`}
+        className={`text-sm min-w-0 w-full mt-1 ${cfg.text} ${cfg.darkText} [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current`}
         data-component-part="callout-content"
       >
         {title && <p className="font-semibold mb-1">{title}</p>}
@@ -72,26 +96,35 @@ export function Callout({ type, children, title }: CalloutProps) {
   );
 }
 
-/* ─── Card / CardGroup ─── */
+/* ─── Card / CardGroup / Columns ─── */
 interface CardProps {
   title: string;
-  icon?: string;
+  icon?: string | ReactNode;
   href?: string;
+  horizontal?: boolean;
+  img?: string;
+  cta?: string;
+  arrow?: boolean;
   children?: ReactNode;
 }
 
-export function Card({ title, href, children }: CardProps) {
+export function Card({ title, icon, href, horizontal, img, cta, arrow, children }: CardProps) {
   const isLinked = !!href;
+  const showArrow = arrow ?? isLinked; // By default show arrow if linked
 
   const handleClick = () => {
     if (href) {
-      window.location.hash = href;
+      if (href.startsWith('http')) {
+        window.open(href, '_blank', 'noreferrer');
+      } else {
+        window.location.hash = href;
+      }
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && href) {
-      window.location.hash = href;
+    if (e.key === 'Enter' && isLinked) {
+      handleClick();
     }
   };
 
@@ -103,22 +136,37 @@ export function Card({ title, href, children }: CardProps) {
       onClick={isLinked ? handleClick : undefined}
       onKeyDown={isLinked ? handleKeyDown : undefined}
     >
-      <div className="px-6 py-5 relative" data-component-part="card-content-container">
-        {isLinked && (
-          <div className="absolute text-gray-400 dark:text-gray-500 group-hover:text-primary dark:group-hover:text-primary-light top-5 right-5">
+      {img && (
+        <img alt={title} className="w-full object-cover object-center not-prose min-h-[160px]" data-component-part="card-image" src={img} />
+      )}
+      <div className={`px-6 py-5 relative ${horizontal ? 'flex items-center gap-x-4' : ''}`} data-component-part="card-content-container">
+        {showArrow && (
+          <div className="absolute text-gray-400 dark:text-gray-500 group-hover:text-primary dark:group-hover:text-primary-light top-5 right-5 hidden md:block" id="card-link-arrow-icon">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
             </svg>
           </div>
         )}
-        <h3 className="font-semibold text-sm text-gray-800 dark:text-white mt-0" data-component-part="card-title">
-          {title}
-        </h3>
-        {children && (
-          <div className="mt-1 font-normal text-sm leading-6 text-gray-600 dark:text-gray-400" data-component-part="card-content">
-            {children}
+        {icon && (
+          <div className="h-6 w-6 fill-gray-800 dark:fill-gray-100 text-gray-800 dark:text-gray-100 shrink-0" data-component-part="card-icon">
+            <Icon name={icon} className="w-6 h-6" />
           </div>
         )}
+        <div className="w-full">
+          <h3 className={`font-semibold text-base text-gray-800 dark:text-white ${!horizontal && icon ? 'mt-4' : 'mt-0'}`} data-component-part="card-title">
+            {title}
+          </h3>
+          {children && (
+            <div className={`prose font-normal text-base leading-6 text-gray-600 dark:text-gray-400 ${!horizontal ? 'mt-1' : 'mt-0'}`} data-component-part="card-content">
+              <span>{children}</span>
+            </div>
+          )}
+          {cta && (
+            <div className="mt-4 font-semibold text-primary dark:text-primary-light text-sm flex items-center gap-1">
+              {cta} <ChevronRight className="w-4 h-4" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -132,12 +180,27 @@ interface CardGroupProps {
 export function CardGroup({ cols = 2, children }: CardGroupProps) {
   return (
     <div
-      className={`columns card-group max-w-none gap-4 my-4 grid-cols-1 ${cols >= 2 ? 'sm:grid-cols-2' : ''} ${cols >= 3 ? 'lg:grid-cols-3' : ''} ${cols >= 4 ? 'xl:grid-cols-4' : ''}`}
-      style={{ '--cols': cols, display: 'grid', gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` } as React.CSSProperties}
+      className="card-group grid gap-4 my-6 sm:grid-cols-[repeat(var(--cols),minmax(0,1fr))]"
+      style={{ '--cols': cols } as React.CSSProperties}
     >
       {children}
     </div>
   );
+}
+
+export function Columns({ cols = 2, children }: CardGroupProps) {
+  return (
+    <div
+      className="layout-columns grid gap-4 my-6 sm:grid-cols-[repeat(var(--cols),minmax(0,1fr))]"
+      style={{ '--cols': cols } as React.CSSProperties}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function Column({ children }: { children: ReactNode }) {
+  return <div className="layout-column min-w-0">{children}</div>;
 }
 
 /* ─── CodeBlock ─── */
@@ -145,11 +208,16 @@ interface CodeBlockProps {
   code: string;
   language?: string;
   filename?: string;
+  title?: string;
+  icon?: string;
+  wrap?: boolean;
+  expandable?: boolean;
 }
 
-export function CodeBlock({ code, language = 'text', filename }: CodeBlockProps) {
+export function CodeBlock({ code, language = 'text', filename, title, icon, wrap, expandable }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const [highlightedHtml, setHighlightedHtml] = useState<string>('');
+  const [isExpanded, setIsExpanded] = useState(!expandable);
 
   useEffect(() => {
     highlight(code, language).then(setHighlightedHtml);
@@ -175,14 +243,17 @@ export function CodeBlock({ code, language = 'text', filename }: CodeBlockProps)
     </button>
   );
 
+  const displayTitle = title || filename;
+
   return (
     <div
-      className={`code-block mt-5 mb-8 not-prose rounded-2xl relative group min-w-0 text-gray-950 dark:text-gray-50 border border-gray-950/10 dark:border-white/10 ${filename ? 'bg-gray-50 dark:bg-white/5 p-0.5' : 'bg-transparent'}`}
+      className={`code-block mt-5 mb-8 not-prose rounded-2xl relative group min-w-0 text-gray-950 dark:text-gray-50 border border-gray-950/10 dark:border-white/10 overflow-hidden ${displayTitle ? 'bg-gray-50 dark:bg-white/5 p-0.5' : 'bg-transparent dark:bg-transparent'}`}
     >
-      {filename && (
+      {displayTitle && (
         <div className="flex text-gray-400 text-xs rounded-t-[14px] leading-6 font-medium pl-4 pr-2.5 py-1" data-component-part="code-block-header">
-          <div className="flex-grow-0 flex items-center gap-1.5 text-gray-700 dark:text-gray-300 min-w-0" data-component-part="code-block-header-filename">
-            <span className="truncate min-w-0" title={filename}>{filename}</span>
+          <div className="flex-grow-0 flex items-center gap-2 text-gray-700 dark:text-gray-300 min-w-0" data-component-part="code-block-header-filename">
+            {icon && <Icon name={icon} className="size-3.5 opacity-80" />}
+            <span className="truncate min-w-0" title={displayTitle}>{displayTitle}</span>
           </div>
           <div className="flex-1 flex items-center justify-end gap-1.5">
             {copyButton('')}
@@ -190,23 +261,34 @@ export function CodeBlock({ code, language = 'text', filename }: CodeBlockProps)
         </div>
       )}
 
-      <div className={`w-0 min-w-full max-w-full py-3.5 px-4 h-full dark:bg-codeblock relative text-sm leading-6 code-block-background ${filename ? 'rounded-b-[14px] rounded-t-xl' : 'rounded-2xl'} bg-white dark:bg-[#1a1a1e] overflow-x-auto`} data-component-part="code-block-root">
-        {!filename && (
+      <div className={`w-0 min-w-full max-w-full py-3.5 px-4 h-full relative text-sm leading-6 code-block-background overflow-x-auto rounded-2xl bg-white dark:bg-codeblock ${expandable && !isExpanded ? 'max-h-64' : ''}`} data-component-part="code-block-root">
+        {!displayTitle && (
           <div className="absolute top-3 right-4 flex items-center gap-1.5 z-10">
             {copyButton('opacity-0 group-hover:opacity-100 transition-opacity')}
           </div>
         )}
         {highlightedHtml ? (
           <div
-            className="shiki-wrapper font-mono whitespace-pre leading-6 [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent"
+            className={`shiki-wrapper font-mono whitespace-pre leading-6 [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent ${wrap ? '[&_pre]:!whitespace-pre-wrap [&_pre]:!break-words' : ''}`}
             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
           />
         ) : (
-          <pre className="font-mono whitespace-pre leading-6">
+          <pre className={`font-mono leading-6 ${wrap ? 'whitespace-pre-wrap break-words' : 'whitespace-pre'}`}>
             <code data-language={language}>{code}</code>
           </pre>
         )}
       </div>
+
+      {expandable && (
+        <div className="flex items-center justify-center p-2 border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 relative z-20">
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+          >
+            {isExpanded ? 'Collapse code' : 'Expand code'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -230,21 +312,22 @@ export function CodeGroup({ tabs }: CodeGroupProps) {
   const activeHtml = highlightedTabs[activeTab] || '';
 
   return (
-    <div className="code-block mt-5 mb-8 not-prose rounded-2xl relative group min-w-0 text-gray-950 dark:text-gray-50 bg-gray-50 dark:bg-white/5 border border-gray-950/10 dark:border-white/10 p-0.5">
-      <div className="flex text-gray-400 text-xs rounded-t-[14px] leading-6 font-medium pl-1 pr-2.5 py-1" data-component-part="code-block-header">
-        <div className="flex items-center gap-0">
+    <div className="code-block mt-5 mb-8 not-prose rounded-2xl relative group min-w-0 text-gray-950 dark:text-gray-50 border border-gray-950/10 dark:border-white/10 overflow-hidden bg-gray-50 dark:bg-white/5 p-0.5">
+      <div className="flex text-gray-400 text-sm bg-transparent px-4" data-component-part="code-block-header">
+        <div className="flex items-center gap-4">
           {tabs.map((tab, i) => (
             <button
               key={i}
               onClick={() => setActiveTab(i)}
-              className={`px-3 py-0.5 rounded-md text-xs font-medium transition-colors ${i === activeTab ? 'text-gray-700 dark:text-gray-300 bg-white dark:bg-white/10' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              className={`relative py-3 px-1 text-sm font-medium transition-colors ${i === activeTab ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
             >
               {tab.title}
+              {i === activeTab && <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-gray-900 dark:bg-white rounded-t-md" />}
             </button>
           ))}
         </div>
       </div>
-      <div className="w-0 min-w-full max-w-full py-3.5 px-4 h-full dark:bg-codeblock relative text-sm leading-6 code-block-background rounded-b-[14px] rounded-t-xl bg-white dark:bg-[#1a1a1e] overflow-x-auto" data-component-part="code-block-root">
+      <div className="w-0 min-w-full max-w-full py-3.5 px-4 h-full relative text-sm leading-6 code-block-background overflow-x-auto rounded-2xl bg-white dark:bg-codeblock" data-component-part="code-block-root">
         {activeHtml ? (
           <div
             className="shiki-wrapper font-mono whitespace-pre leading-6 [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent"
@@ -391,21 +474,36 @@ interface HeadingAnchorProps {
 }
 
 export function HeadingAnchor({ id, level, children }: HeadingAnchorProps) {
-  const className = "flex whitespace-pre-wrap group font-semibold scroll-mt-24";
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const url = new URL(window.location.href);
+    url.hash = `/${url.hash.replace('#/', '').split('#')[0]}#${id}`;
+    
+    // Update window hash visually without completely resetting page
+    window.history.replaceState(null, '', url.hash);
+    
+    navigator.clipboard.writeText(url.toString());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const className = "flex whitespace-pre-wrap group font-semibold scroll-mt-24 items-center";
   const inner = (
     <>
-      <div className="absolute" tabIndex={-1}>
-        <a
-          aria-label="Navigate to header"
-          className="-ml-10 flex items-center opacity-0 border-0 group-hover:opacity-100 focus:opacity-100 focus:outline-0 group/link"
-          href={`#${id}`}
+      <div className="absolute -ml-10" tabIndex={-1}>
+        <button
+          aria-label="Copy link to header"
+          onClick={handleCopyLink}
+          className="flex items-center opacity-0 border-0 group-hover:opacity-100 focus:opacity-100 focus:outline-0 group/link transition-opacity"
         >
-          <div className="w-6 h-6 rounded-md flex items-center justify-center shadow-sm text-gray-400 dark:text-white/50 dark:bg-background-dark dark:brightness-[1.35] dark:ring-1 bg-white ring-1 ring-gray-400/30 dark:ring-gray-700/25 hover:ring-gray-400/60 dark:hover:ring-white/20">
-            <LinkIcon className="w-3 h-3" />
+          <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white dark:bg-[#1a1a1e] dark:ring-1 bg-white ring-1 ring-gray-200 dark:ring-white/10 hover:ring-gray-300 dark:hover:ring-white/30 transition-all">
+            {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <LinkIcon className="w-3.5 h-3.5" />}
           </div>
-        </a>
+        </button>
       </div>
-      <span className="cursor-pointer">{children}</span>
+      <span className="cursor-pointer" onClick={handleCopyLink}>{children}</span>
     </>
   );
 
@@ -418,23 +516,227 @@ export function HeadingAnchor({ id, level, children }: HeadingAnchorProps) {
 /* ─── Badge ─── */
 interface BadgeProps {
   children: ReactNode;
-  color?: 'blue' | 'green' | 'yellow' | 'red' | 'gray';
+  color?: 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'gray' | 'white' | 'surface' | 'white-destructive' | 'surface-destructive';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
+  shape?: 'rounded' | 'pill';
+  stroke?: boolean;
+  disabled?: boolean;
+  icon?: string | ReactNode;
 }
 
-export function Badge({ children, color = 'blue' }: BadgeProps) {
-  const colors: Record<string, string> = {
-    blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    green: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    yellow: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    red: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-    gray: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+export function Badge({ children, color = 'blue', size = 'md', shape = 'rounded', stroke = false, disabled = false, icon }: BadgeProps) {
+  const bgColors: Record<string, string> = {
+    blue: stroke ? 'text-blue-800 dark:text-blue-300 border-blue-500 bg-transparent' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-transparent',
+    green: stroke ? 'text-green-800 dark:text-green-300 border-green-500 bg-transparent' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-transparent',
+    yellow: stroke ? 'text-yellow-800 dark:text-yellow-300 border-yellow-500 bg-transparent' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-transparent',
+    orange: stroke ? 'text-orange-800 dark:text-orange-300 border-orange-500 bg-transparent' : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-transparent',
+    red: stroke ? 'text-red-800 dark:text-red-300 border-red-500 bg-transparent' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-transparent',
+    purple: stroke ? 'text-purple-800 dark:text-purple-300 border-purple-500 bg-transparent' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-transparent',
+    gray: stroke ? 'text-gray-800 dark:text-gray-300 border-gray-500 bg-transparent' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border-transparent',
+    white: stroke ? 'text-gray-900 border-gray-200 bg-transparent' : 'bg-white text-gray-900 border-gray-200 shadow-sm',
+    surface: stroke ? 'text-gray-900 border-gray-200 bg-transparent' : 'bg-gray-50 text-gray-900 border-gray-200',
   };
 
+  const sizes: Record<string, string> = {
+    xs: 'px-1.5 py-0.5 text-[10px]',
+    sm: 'px-2 py-0.5 text-xs',
+    md: 'px-2.5 py-0.5 text-sm',
+    lg: 'px-3 py-1 text-base',
+  };
+
+  const radius = shape === 'pill' ? 'rounded-full' : 'rounded-md';
+  const borderClass = stroke ? 'border' : 'border';
+  const disabledClass = disabled ? 'opacity-50 cursor-not-allowed' : '';
+
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${colors[color]}`}>
+    <span className={`inline-flex items-center gap-1 ${sizes[size]} font-medium ${radius} ${borderClass} ${bgColors[color] || bgColors.blue} ${disabledClass}`}>
+      {icon && (
+        <span className="shrink-0 flex items-center"><Icon name={icon} className="w-3.5 h-3.5" /></span>
+      )}
       {children}
     </span>
   );
+}
+
+/* ─── Examples and Panel ─── */
+export function Panel({ children }: { children: ReactNode }) {
+  return (
+    <div className="panel grid min-w-0 grid-cols-1 lg:grid-cols-2 xl:gap-12 gap-8 items-start">
+      {children}
+    </div>
+  );
+}
+
+export function RequestExample({ children }: { children: ReactNode }) {
+  return (
+    <div className="request-example relative sticky top-24 pt-4 lg:pt-0 -mt-4 min-w-0">
+      {children}
+    </div>
+  );
+}
+
+export function ResponseExample({ children }: { children: ReactNode }) {
+  return (
+    <div className="response-example relative lg:pt-4 min-w-0">
+      {children}
+    </div>
+  );
+}
+
+/* ─── Update ─── */
+interface UpdateProps {
+  label: string;
+  description?: string;
+  tags?: string[];
+  children: ReactNode;
+}
+
+export function Update({ label, description, tags, children }: UpdateProps) {
+  return (
+    <div className="update relative sm:pl-10 lg:pl-0 lg:flex lg:gap-8 mt-12 overflow-hidden lg:overflow-visible">
+      {/* Date/Version Sidebar (Desktop) */}
+      <div className="hidden lg:block lg:w-48 lg:shrink-0 lg:text-right relative">
+        <div className="font-semibold text-gray-900 dark:text-gray-100">{label}</div>
+        {description && <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</div>}
+        {tags && tags.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5 lg:justify-end">
+            {tags.map((tag, i) => (
+              <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        
+        {/* The Node Circle & Line aligned to the right edge of this column */}
+        <div className="absolute top-1.5 -right-[21px] size-2.5 rounded-full border-2 border-primary bg-white dark:bg-background-dark z-10" />
+        <div className="absolute top-4 -bottom-12 -right-[17px] w-px bg-gray-200 dark:bg-gray-800 last-update-line" />
+      </div>
+
+      {/* Mobile Dateline */}
+      <div className="lg:hidden relative">
+        <div className="absolute top-1.5 -left-[28px] size-2.5 rounded-full border-2 border-primary bg-white dark:bg-background-dark z-10" />
+        <div className="absolute top-4 -bottom-12 -left-[24px] w-px bg-gray-200 dark:bg-gray-800 last-update-line" />
+        <div className="font-semibold text-gray-900 dark:text-gray-100">{label}</div>
+        {description && <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</div>}
+        {tags && tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {tags.map((tag, i) => (
+              <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="prose w-full flex-1 min-w-0 mt-4 lg:mt-0 pb-12">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Prompt ─── */
+interface PromptProps {
+  prompt: string;
+  response: string;
+}
+
+export function Prompt({ prompt, response }: PromptProps) {
+  return (
+    <div className="prompt my-6 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-[#f9fafb] dark:bg-[#1a1a1e] text-sm font-mono shadow-sm">
+      <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-start gap-4">
+        <Terminal className="size-5 shrink-0 text-gray-400 mt-0.5" />
+        <div className="flex-1 text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">{prompt}</div>
+      </div>
+      <div className="px-5 py-4 bg-gray-50 dark:bg-white/5 border-l-2 border-primary/20 text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+        {response}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Tree ─── */
+export function Tree({ children }: { children: ReactNode }) {
+  return (
+    <div className="tree font-mono text-sm leading-6 border border-gray-200 dark:border-gray-800 rounded-xl my-4 py-2 bg-white dark:bg-[#1a1a1e]">
+      {children}
+    </div>
+  );
+}
+
+export function TreeFolder({ name, defaultOpen = false, children }: { name: string; defaultOpen?: boolean; children: ReactNode }) {
+  return (
+    <details className="tree-folder group" open={defaultOpen}>
+      <summary className="flex items-center gap-2 px-4 py-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 list-none [&::-webkit-details-marker]:hidden">
+        <ChevronRight className="w-3.5 h-3.5 text-gray-400 transition-transform group-open:rotate-90" />
+        <Folder className="w-4 h-4 text-blue-400 fill-blue-400/20" />
+        <span className="font-semibold text-gray-800 dark:text-gray-200">{name}</span>
+      </summary>
+      <div className="tree-children border-l border-gray-200 dark:border-gray-800 ml-6 pl-2 my-1 hidden group-open:block">
+        {children}
+      </div>
+    </details>
+  );
+}
+
+export function TreeFile({ name }: { name: string }) {
+  return (
+    <div className="tree-file flex items-center gap-2 px-4 py-1.5 ml-5 hover:bg-gray-50 dark:hover:bg-white/5">
+      <File className="w-4 h-4 text-gray-400" />
+      <span className="text-gray-600 dark:text-gray-300">{name}</span>
+    </div>
+  );
+}
+
+/* ─── Tile ─── */
+interface TileProps {
+  icon?: string | ReactNode;
+  title: string;
+  description: string;
+  href?: string;
+}
+
+export function Tile({ icon, title, description, href }: TileProps) {
+  const isLinked = !!href;
+  const Wrapper = isLinked ? 'a' : 'div';
+  return (
+    <Wrapper 
+      href={href} 
+      className={`tile block p-5 my-4 border border-gray-200 dark:border-gray-800 rounded-2xl bg-white dark:bg-[#1a1a1e] min-w-0 ${isLinked ? 'hover:border-primary dark:hover:border-primary-light transition-colors group cursor-pointer' : ''}`}
+    >
+      {icon && (
+        <div className={`mb-4 size-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 ${isLinked ? 'group-hover:bg-primary/5 group-hover:text-primary transition-colors' : ''}`}>
+          <Icon name={icon} className="w-6 h-6" />
+        </div>
+      )}
+      <h3 className="font-semibold text-gray-900 dark:text-white m-0 tracking-tight">{title}</h3>
+      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-0">{description}</p>
+    </Wrapper>
+  );
+}
+
+/* ─── Color ─── */
+export function Color({ hex, name }: { hex: string; name?: string }) {
+  return (
+    <div className="color-swatch flex items-center gap-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0 min-w-[200px]">
+      <div className="size-10 rounded-lg shadow-inner ring-1 ring-inset ring-black/10" style={{ backgroundColor: hex }} />
+      <div>
+        <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{name || hex}</div>
+        {name && <code className="text-xs text-gray-500 bg-transparent p-0">{hex}</code>}
+      </div>
+    </div>
+  );
+}
+
+export function ColorRow({ children }: { children: ReactNode }) {
+  return <div className="color-row flex flex-wrap gap-x-8 gap-y-2 my-4">{children}</div>;
+}
+
+export function ColorItem({ hex, name }: { hex: string; name?: string }) {
+  return <Color hex={hex} name={name} />;
 }
 
 /* ─── Frame ─── */
@@ -477,39 +779,41 @@ export function Tooltip({ children, tip }: TooltipProps) {
   );
 }
 
-/* ─── Mermaid ─── */
-let mermaidInitialized = false;
+// Removed `mermaidInitialized` variable
+import { useTheme } from '@/hooks/useTheme';
 
-interface MermaidDiagramProps {
+interface MermaidProps {
   chart: string;
 }
 
-export function MermaidDiagram({ chart }: MermaidDiagramProps) {
+export function Mermaid({ chart }: MermaidProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState<string>('');
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    if (!mermaidInitialized) {
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: 'default',
-        securityLevel: 'loose',
-      });
-      mermaidInitialized = true;
-    }
-
-    const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
-    mermaid.render(id, chart).then(({ svg: rendered }) => {
-      setSvg(rendered);
-    }).catch(() => {
-      setSvg(`<pre class="text-red-500 text-sm">Failed to render Mermaid diagram</pre>`);
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: resolvedTheme === 'dark' ? 'dark' : 'default',
+      securityLevel: 'loose',
     });
-  }, [chart]);
+
+    const renderChart = async () => {
+      try {
+        const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
+        const { svg: rendered } = await mermaid.render(id, chart);
+        setSvg(rendered);
+      } catch (e) {
+        setSvg(`<pre class="text-red-500 text-sm">Failed to render Mermaid diagram.</pre>`);
+      }
+    };
+    renderChart();
+  }, [chart, resolvedTheme]);
 
   return (
     <div
       ref={containerRef}
-      className="my-6 flex justify-center not-prose [&_svg]:max-w-full"
+      className="my-6 flex justify-center not-prose [&_svg]:max-w-full [&_svg]:min-w-0"
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );
