@@ -99,7 +99,7 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
               className="hidden sm:flex items-center gap-2 h-9 rounded-lg px-2 w-[220px] text-sm text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black/20"
             >
               <Search className="w-4 h-4 flex-shrink-0" />
-              <span className="flex-1 text-left">{config.search?.prompt || 'Search...'}</span>
+              <span className="flex-1 text-left truncate whitespace-nowrap min-w-0">{config.search?.prompt || 'Search...'}</span>
               <kbd className="hidden md:flex h-5 items-center justify-center rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-1.5 font-sans text-[10px] font-medium text-gray-400">
                 ⌘K
               </kbd>
