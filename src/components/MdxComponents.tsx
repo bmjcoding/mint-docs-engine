@@ -148,7 +148,7 @@ export function Card({ title, icon, href, horizontal, img, cta, arrow, children 
           </div>
         )}
         {icon && (
-          <div className="h-6 w-6 fill-gray-800 dark:fill-gray-100 text-gray-800 dark:text-gray-100 shrink-0" data-component-part="card-icon">
+          <div className="h-6 w-6 fill-gray-800 dark:fill-primary-light text-gray-800 dark:text-primary-light shrink-0" data-component-part="card-icon">
             <Icon name={icon} className="w-6 h-6" />
           </div>
         )}

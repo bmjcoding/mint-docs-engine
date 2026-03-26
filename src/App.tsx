@@ -222,7 +222,7 @@ export default function App() {
         {/* Main content area */}
         <div
           id="content-area"
-          className="relative grow box-border flex-col w-full mx-auto px-1 lg:pl-[23.7rem] lg:-ml-12 xl:pl-[calc(18rem+var(--sidebar-inset))] xl:pr-4"
+          className="relative grow box-border flex-col w-full mx-auto px-1 lg:pl-[23.7rem] lg:-ml-12 xl:pl-[calc(18rem+var(--sidebar-inset))] xl:pr-0"
         >
           <div className="pt-[calc(var(--navbar-height)+2rem)] lg:pt-12 w-full max-w-4xl px-4 sm:px-8 xl:pl-[96px] xl:pr-6 flex-1">
 
@@ -244,7 +244,7 @@ export default function App() {
                       </h1>
                       {/* Copy page button */}
                       <div id="page-context-menu" className="items-center shrink-0 justify-end ml-auto sm:flex hidden">
-                        <div className="flex items-center h-[30px] rounded-lg border border-[#1a1a1c] text-[#c7c7c7] text-[14px] transition-colors hover:border-gray-600">
+                        <div className="flex items-center h-[30px] rounded-lg border border-[#212123] text-[#c7c7c7] text-[14px] transition-colors hover:border-gray-600">
                           <button
                             onClick={handleCopyPage}
                             className="flex items-center gap-1.5 px-3 h-full cursor-pointer"
@@ -258,7 +258,7 @@ export default function App() {
                               </>
                             )}
                           </button>
-                          <div className="w-px h-4 bg-[#1a1a1c]" />
+                          <div className="w-px h-4 bg-[#212123]" />
                           <button className="flex items-center px-2 h-full cursor-pointer">
                             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                           </button>

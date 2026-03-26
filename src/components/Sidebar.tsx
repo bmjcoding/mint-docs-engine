@@ -13,7 +13,7 @@ interface SidebarProps {
 export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMobileClose }: SidebarProps) {
   function renderNavPages(pages: (string | NavGroup)[], level = 0): ReactNode {
     return (
-      <ul className={`sidebar-group ${level === 0 ? 'space-y-0.5' : 'ml-3 border-l border-gray-100 dark:border-[#141416] space-y-0.5 pl-1 pt-1'}`}>
+      <ul className={`sidebar-group ${level === 0 ? 'space-y-0.5' : 'ml-3 border-l border-gray-100 dark:border-[#151516] space-y-0.5 pl-1 pt-1'}`}>
         {pages.map((item, idx) => {
           if (typeof item === 'string') {
             const pageSlug = item;
@@ -106,7 +106,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       {mobileOpen && (
         <>
           <div className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={onMobileClose} />
-          <div className="lg:hidden fixed left-0 bottom-0 z-50 w-[18rem] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-[#141416]" style={{ top: 'var(--navbar-height, 56px)' }}>
+          <div className="lg:hidden fixed left-0 bottom-0 z-50 w-[18rem] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-[#151516]" style={{ top: 'var(--navbar-height, 56px)' }}>
             <div className="p-4">
               {sidebarContent}
             </div>

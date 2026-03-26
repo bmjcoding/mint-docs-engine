@@ -41,7 +41,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
   return (
     <div
       id="content-side-layout"
-      className="hidden xl:flex self-start sticky xl:flex-col max-w-[20rem] z-[21] h-[calc(100vh-var(--navbar-height,6.5rem)-1.5rem)] top-[calc(var(--navbar-height,6.5rem)+2.5rem)]"
+      className="hidden xl:flex self-start sticky xl:flex-col max-w-[20rem] z-[21] h-[calc(100vh-var(--navbar-height,6.5rem)-1.5rem)] top-[calc(var(--navbar-height,6.5rem)+2.5rem)] pl-[2vw]"
     >
       <div
         id="table-of-contents-layout"

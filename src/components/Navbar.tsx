@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDocsConfig } from '@/hooks/useDocsConfig';
 import { useTheme } from '@/hooks/useTheme';
-import { Search, Sun, Moon, Monitor, Github, ExternalLink, Menu } from 'lucide-react';
+import { Search, Sun, Moon, Github, ExternalLink, Menu } from 'lucide-react';
 import type { NavAnchor } from '@/lib/types';
 
 interface NavbarProps {
@@ -16,7 +16,7 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
   const config = useDocsConfig();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [isOpaque, setIsOpaque] = useState(false);
-  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,22 +42,18 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
       id="navbar"
       className="z-50 fixed lg:sticky top-0 w-full"
     >
-      {/* Blur background layer */}
+      {/* Blur background layer — provides transparency + blur on scroll */}
       <div
         id="navbar-transition"
-        className={`absolute w-full h-full backdrop-blur flex-none transition-colors duration-500 pointer-events-none ${isOpaque
-          ? 'bg-background-light/95 dark:bg-background-dark/75'
-          : 'bg-background-light/60 dark:bg-transparent'
-        }`}
-        data-is-opaque={isOpaque ? 'true' : 'false'}
+        className="absolute w-full h-full backdrop-blur-sm flex-none transition-colors duration-500 pointer-events-none bg-background-light/70 dark:bg-background-dark/70"
       />
 
       {/* Content */}
       <div className="z-10 relative">
 
         {/* ── Row 1: Top bar ── */}
-        <div className="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
-          <div className="flex items-center gap-3 px-4 lg:px-10 xl:px-[var(--layout-inset)] h-[60px] w-full">
+        <div>
+          <div className="flex items-center gap-3 px-4 lg:px-10 xl:px-[var(--layout-inset)] h-[60px] w-full relative">
 
             {/* Logo */}
             <a
@@ -90,11 +86,11 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Center: Search + Ask AI */}
-            <div className="hidden sm:flex flex-1 items-center justify-center gap-2">
+            {/* Center: Search + Ask AI — absolutely centered in the row */}
+            <div className="hidden sm:flex absolute left-1/2 -translate-x-1/2 items-center gap-2">
               <button
                 onClick={onSearchOpen}
-                className="flex items-center gap-2 h-9 rounded-xl px-3.5 w-[340px] text-sm text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors bg-gray-100 dark:bg-[#09090b] border border-gray-200 dark:border-[#141416]"
+                className="flex items-center gap-2 h-9 rounded-xl px-3.5 w-[300px] lg:w-[340px] text-sm text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors bg-gray-100 dark:bg-[#09090b] border border-gray-200 dark:border-[#212123]"
               >
                 <Search className="w-4 h-4 flex-shrink-0" />
                 <span className="flex-1 text-left truncate whitespace-nowrap min-w-0">Search...</span>
@@ -105,7 +101,7 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
 
               <button
                 onClick={onSearchOpen}
-                className="flex items-center gap-1.5 h-9 rounded-xl px-3 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border border-gray-200 dark:border-[#141416]"
+                className="flex items-center gap-1.5 h-9 rounded-xl px-3 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border border-gray-200 dark:border-[#212123]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" className="w-4 h-4 shrink-0"><g fill="currentColor"><path d="M5.658,2.99l-1.263-.421-.421-1.263c-.137-.408-.812-.408-.949,0l-.421,1.263-1.263,.421c-.204,.068-.342,.259-.342,.474s.138,.406,.342,.474l1.263,.421,.421,1.263c.068,.204,.26,.342,.475,.342s.406-.138,.475-.342l.421-1.263,1.263-.421c.204-.068,.342-.259,.342-.474s-.138-.406-.342-.474Z" fill="currentColor" stroke="none" /><polygon points="9.5 2.75 11.412 7.587 16.25 9.5 11.412 11.413 9.5 16.25 7.587 11.413 2.75 9.5 7.587 7.587 9.5 2.75" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" /></g></svg>
                 <span>Ask AI</span>
@@ -115,11 +111,14 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
             {/* Search — mobile icon */}
             <button
               onClick={onSearchOpen}
-              className="sm:hidden p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 flex-1"
+              className="sm:hidden p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
             </button>
+
+            {/* Spacer to push right-side items */}
+            <div className="flex-1" />
 
             {/* Anchor links from active tab — shown in top bar */}
             {anchors && anchors.length > 0 && (
@@ -175,50 +174,23 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
               </a>
             )}
 
-            {/* Theme toggle */}
-            <div className="relative">
-              <button
-                onClick={() => setThemeMenuOpen(!themeMenuOpen)}
-                className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {resolvedTheme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-              </button>
-
-              {themeMenuOpen && (
-                <>
-                  <div className="fixed inset-0 z-[90]" onClick={() => setThemeMenuOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-36 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl z-[100] py-1">
-                    {[
-                      { mode: 'light' as const, icon: Sun, label: 'Light' },
-                      { mode: 'dark' as const, icon: Moon, label: 'Dark' },
-                      { mode: 'system' as const, icon: Monitor, label: 'System' },
-                    ].map(({ mode, icon: Icon, label }) => (
-                      <button
-                        key={mode}
-                        onClick={() => { setTheme(mode); setThemeMenuOpen(false); }}
-                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors ${theme === mode
-                          ? 'text-black dark:text-white bg-gray-50 dark:bg-white/5'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+            {/* Theme toggle — simple light/dark switch */}
+            <button
+              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {resolvedTheme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
 
           </div>
           {/* Divider that starts at content edge */}
-          <div className="ml-4 lg:ml-10 xl:ml-[var(--layout-inset)] border-b border-gray-200/60 dark:border-[#141416]" />
+          <div className="ml-4 lg:ml-10 xl:ml-[var(--layout-inset)] mr-4 lg:mr-10 xl:mr-[var(--layout-inset)] border-b border-gray-200/60 dark:border-[#151516]" />
         </div>
 
         {/* ── Row 2: Tab navigation ── */}
         {tabs.length > 1 && (
-          <div className="w-full border-b border-gray-200/60 dark:border-[#141416] bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md">
+          <div className="w-full border-b border-gray-200/60 dark:border-[#151516]">
             <div className="nav-tabs h-[46px] flex items-center text-[14px] gap-x-6 px-4 lg:px-10 xl:px-[var(--layout-inset)] overflow-x-auto">
               {tabs.map((tab, i) => (
                 <button
