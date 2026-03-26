@@ -58,7 +58,7 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
     <div
       ref={navRef}
       id="navbar"
-      className="z-50 fixed lg:sticky top-0 w-full"
+      className={`z-50 fixed lg:sticky top-0 w-full ${mobileMenuOpen ? 'max-lg:hidden' : ''}`}
     >
       {/* Blur background layer — provides transparency + blur on scroll */}
       <div
