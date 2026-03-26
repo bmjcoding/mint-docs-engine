@@ -116,7 +116,15 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       {mobileOpen && (
         <>
           <div className="lg:hidden fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm" onClick={onMobileClose} />
-          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-[70] w-[min(65vw,20rem)] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-[#151516]">
+          {/* X close button — floating over overlay at top-right */}
+          <button
+            onClick={onMobileClose}
+            className="lg:hidden fixed top-4 right-4 z-[80] p-2 text-gray-400 hover:text-gray-200 transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-[70] w-[min(80vw,24rem)] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-[#151516]">
 
             {/* Mobile sidebar header: logo + theme toggle */}
             <div className="flex items-center px-4 h-[60px]">

@@ -81,7 +81,7 @@ When working on UI changes:
 
 ## Dev Server
 
-- Run on a **non-default port** to avoid conflicts with worktree sessions: `npx vite --port 5174`
+- Run on a **non-default port** to avoid conflicts with worktree sessions: `npx vite --port {open-port}`
 - Another Claude session may be running a dev server on port 5173 from a worktree — do not kill it
 
 ## Build & Lint
