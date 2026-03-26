@@ -65,7 +65,7 @@ export function Callout({ type, children, title, icon, color }: CalloutProps) {
       >
         {icon && <div className="flex-none size-5 mt-0.5" style={{ color }}><Icon name={icon} className="w-5 h-5" /></div>}
         <div
-          className="text-sm min-w-0 w-full mt-1 [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current"
+          className="text-sm min-w-0 w-full [&>:first-child]:!mt-0 [&>:last-child]:!mb-0 [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current"
           data-component-part="callout-content"
           style={{ color }}
         >
@@ -86,7 +86,7 @@ export function Callout({ type, children, title, icon, color }: CalloutProps) {
     >
       <IconComponent className={`flex-none ${cfg.iconSize} ${cfg.text} ${cfg.darkText} mt-0.5`} />
       <div
-        className={`text-sm min-w-0 w-full mt-1 ${cfg.text} ${cfg.darkText} [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current`}
+        className={`text-sm min-w-0 w-full [&>:first-child]:!mt-0 [&>:last-child]:!mb-0 ${cfg.text} ${cfg.darkText} [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current`}
         data-component-part="callout-content"
       >
         {title && <p className="font-semibold mb-1">{title}</p>}
