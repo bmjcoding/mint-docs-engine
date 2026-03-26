@@ -1,4 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
+import { useDocsConfig } from '@/hooks/useDocsConfig';
+import { useTheme } from '@/hooks/useTheme';
+import { X, Sun, Moon, ChevronDown, Check } from 'lucide-react';
 import type { NavTab, NavGroup } from '@/lib/types';
 import Icon from '@/components/Icon';
 
@@ -8,9 +11,16 @@ interface SidebarProps {
   onNavigate: (slug: string) => void;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
+  tabs?: NavTab[];
+  activeTabIdx?: number;
+  onTabChange?: (idx: number) => void;
 }
 
-export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMobileClose }: SidebarProps) {
+export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMobileClose, tabs, activeTabIdx, onTabChange }: SidebarProps) {
+  const config = useDocsConfig();
+  const { setTheme, resolvedTheme } = useTheme();
+  const [tabDropdownOpen, setTabDropdownOpen] = useState(false);
+
   function renderNavPages(pages: (string | NavGroup)[], level = 0): ReactNode {
     return (
       <ul className={`sidebar-group ${level === 0 ? 'space-y-0.5' : 'ml-3 border-l border-gray-100 dark:border-[#151516] space-y-0.5 pl-1 pt-1'}`}>
@@ -102,12 +112,93 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
         </div>
       </div>
 
-      {/* Mobile sidebar overlay */}
+      {/* Mobile sidebar overlay — full-height panel starting from top */}
       {mobileOpen && (
         <>
-          <div className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={onMobileClose} />
-          <div className="lg:hidden fixed left-0 bottom-0 z-50 w-[18rem] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-[#151516]" style={{ top: 'var(--navbar-height, 56px)' }}>
-            <div className="p-4">
+          <div className="lg:hidden fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm" onClick={onMobileClose} />
+          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-[70] w-[min(65vw,20rem)] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-[#151516]">
+
+            {/* Mobile sidebar header: logo + theme toggle */}
+            <div className="flex items-center px-4 h-[60px]">
+              {/* Logo — smaller for mobile sidebar */}
+              <a
+                href={typeof config.logo === 'object' && config.logo?.href ? config.logo.href : '#/'}
+                className="select-none flex-shrink-0"
+                onClick={() => onMobileClose?.()}
+              >
+                {config.logo ? (
+                  typeof config.logo === 'string' ? (
+                    <img src={config.logo} alt={config.name} className="h-5" />
+                  ) : (
+                    <>
+                      {config.logo.light && <img src={config.logo.light} alt={config.name} className="h-5 dark:hidden" />}
+                      {config.logo.dark && <img src={config.logo.dark} alt={config.name} className="h-5 hidden dark:block" />}
+                      {(!config.logo.light && !config.logo.dark) && (
+                        <span className="font-medium text-gray-900 dark:text-gray-100 text-[15px] tracking-tight font-serif">{config.name}</span>
+                      )}
+                    </>
+                  )
+                ) : (
+                  <span className="font-medium text-gray-900 dark:text-gray-100 text-[15px] tracking-tight font-serif">{config.name}</span>
+                )}
+              </a>
+
+              <div className="flex-1" />
+
+              {/* Theme toggle pill */}
+              <div className="flex items-center gap-0.5 rounded-full border border-[#1a1a1c] hover:border-[#222224] transition-colors p-[3px]">
+                <button
+                  onClick={() => setTheme('light')}
+                  className={`cursor-pointer p-2 rounded-full transition-all ${resolvedTheme === 'light' ? 'bg-[#171717] text-gray-200' : 'text-gray-500'}`}
+                  aria-label="Light mode"
+                >
+                  <Sun className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setTheme('dark')}
+                  className={`cursor-pointer p-2 rounded-full transition-all ${resolvedTheme === 'dark' ? 'bg-[#171717] text-gray-200' : 'text-gray-500'}`}
+                  aria-label="Dark mode"
+                >
+                  <Moon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Tab selector dropdown (if multiple tabs) */}
+            {tabs && tabs.length > 1 && (
+              <div className="px-4 pt-4 relative">
+                <button
+                  onClick={() => setTabDropdownOpen(!tabDropdownOpen)}
+                  className="cursor-pointer flex items-center justify-between w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-[#1a1a1c] hover:bg-gray-600/5 dark:hover:bg-gray-200/5 text-base font-medium text-gray-900 dark:text-gray-100 outline-none focus:outline-none transition-colors"
+                >
+                  <span>{tabs[activeTabIdx ?? 0]?.tab}</span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${tabDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {tabDropdownOpen && (
+                  <div className="absolute left-4 right-4 mt-2 rounded-lg border border-gray-300 dark:border-[#1a1a1c] bg-background-light dark:bg-background-dark py-1 z-10">
+                    {tabs.map((t, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          onTabChange?.(i);
+                          setTabDropdownOpen(false);
+                        }}
+                        className={`cursor-pointer flex items-center justify-between w-full px-4 py-3 text-base transition-colors ${i === (activeTabIdx ?? 0)
+                          ? 'text-primary dark:text-primary-light font-medium'
+                          : 'text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <span>{t.tab}</span>
+                        {i === (activeTabIdx ?? 0) && <Check className="w-4 h-4" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Navigation items — bump text size and align with dropdown for mobile */}
+            <div className="p-4 pt-2 [&_.sidebar-group-header]:!text-base [&_.sidebar-group-header]:!pl-4 [&_.sidebar-group_a]:!text-base [&_.sidebar-group_a]:!leading-7 [&_.sidebar-group_a]:![margin-left:4px] [&_.sidebar-group_a]:!cursor-pointer">
               {sidebarContent}
             </div>
           </div>

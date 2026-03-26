@@ -203,7 +203,11 @@ export default function App() {
         onTabChange={handleTabChange}
         onSearchOpen={() => setSearchOpen(true)}
         onMobileMenuOpen={() => setMobileMenuOpen(true)}
+        onMobileMenuClose={() => setMobileMenuOpen(false)}
+        mobileMenuOpen={mobileMenuOpen}
         anchors={activeTab?.anchors}
+        breadcrumbs={breadcrumbs}
+        currentPageTitle={pageData?.frontmatter.title}
       />
 
       <div data-docs-theme="mint" className="max-lg:contents lg:flex lg:w-full">
@@ -216,6 +220,9 @@ export default function App() {
             onNavigate={handleNavigate}
             mobileOpen={mobileMenuOpen}
             onMobileClose={() => setMobileMenuOpen(false)}
+            tabs={config.navigation.tabs}
+            activeTabIdx={activeTabIdx}
+            onTabChange={handleTabChange}
           />
         )}
 
