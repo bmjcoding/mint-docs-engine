@@ -13,7 +13,7 @@ interface SidebarProps {
 export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMobileClose }: SidebarProps) {
   function renderNavPages(pages: (string | NavGroup)[], level = 0): ReactNode {
     return (
-      <ul className={`sidebar-group ${level === 0 ? 'space-y-px' : 'ml-3 border-l border-gray-100 dark:border-gray-800 space-y-px pl-1 pt-1'}`}>
+      <ul className={`sidebar-group ${level === 0 ? 'space-y-0.5' : 'ml-3 border-l border-gray-100 dark:border-[#151516] space-y-0.5 pl-1 pt-1'}`}>
         {pages.map((item, idx) => {
           if (typeof item === 'string') {
             const pageSlug = item;
@@ -29,12 +29,12 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
                 id={`/${pageSlug}`}
               >
                 <a
-                  className={`group flex items-start pr-3 py-1.5 cursor-pointer gap-x-3 text-left break-words rounded-xl w-full outline-offset-[-1px] ${isActive
-                    ? 'bg-primary/10 text-primary dark:text-primary-light dark:bg-primary-light/10 faux-bold'
+                  className={`group flex items-start cursor-pointer gap-x-3 text-left break-words rounded-xl outline-offset-[-1px] text-[14px] leading-6 ${isActive
+                    ? 'bg-primary/15 text-primary dark:text-primary-light dark:bg-primary-light/10 font-medium'
                     : 'hover:bg-gray-600/5 dark:hover:bg-gray-200/5 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                   href={`#/${pageSlug}`}
-                  style={{ paddingLeft: '2rem' }}
+                  style={{ padding: '6px 12px', marginLeft: '20px', marginRight: '4px' }}
                   onClick={(e) => {
                     e.preventDefault();
                     onNavigate(pageSlug);
@@ -73,7 +73,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
         {tab.groups.map((group, gi) => (
           <div key={gi} className={gi > 0 ? 'mt-6 lg:mt-8' : ''}>
             {/* Group header */}
-            <div className="sidebar-group-header flex items-center gap-2.5 pl-8 mb-3.5 lg:mb-2.5 font-semibold text-gray-900 dark:text-gray-200">
+            <div className="sidebar-group-header flex items-center gap-2.5 pl-8 mb-2 font-semibold text-gray-900 dark:text-gray-200 text-[14px]">
               {group.icon && <span className="text-gray-500 w-5 h-5 flex items-center justify-center text-lg -ml-0.5"><Icon name={group.icon} className="w-5 h-5" /></span>}
               <h5 id={`sidebar-title-${gi}`}>{group.group}</h5>
             </div>
@@ -91,8 +91,8 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       {/* Desktop sidebar */}
       <div
         id="sidebar"
-        className="z-20 hidden lg:block fixed bottom-0 right-auto w-[18rem] left-0"
-        style={{ top: 'var(--navbar-height, 6.5rem)' }}
+        className="z-20 hidden lg:block fixed bottom-0 right-auto w-[18rem] left-0 xl:left-[var(--sidebar-inset)]"
+        style={{ top: 'calc(var(--navbar-height, 6.5rem) + 6px)' }}
       >
         <div
           id="sidebar-content"
@@ -106,7 +106,7 @@ export default function Sidebar({ tab, currentSlug, onNavigate, mobileOpen, onMo
       {mobileOpen && (
         <>
           <div className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={onMobileClose} />
-          <div className="lg:hidden fixed left-0 bottom-0 z-50 w-[18rem] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-gray-800" style={{ top: 'var(--navbar-height, 56px)' }}>
+          <div className="lg:hidden fixed left-0 bottom-0 z-50 w-[18rem] bg-background-light dark:bg-background-dark overflow-auto border-r border-gray-200 dark:border-[#151516]" style={{ top: 'var(--navbar-height, 56px)' }}>
             <div className="p-4">
               {sidebarContent}
             </div>

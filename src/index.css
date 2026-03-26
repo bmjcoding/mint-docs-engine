@@ -3,27 +3,37 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: oklch(0.63 0.17 220);
-  --color-primary-light: oklch(0.72 0.17 220);
-  --color-primary-dark: oklch(0.52 0.17 220);
+  --color-primary: #D97757;
+  --color-primary-light: #cda484;
+  --color-primary-dark: #C06545;
 
-  --color-background-light: #fdfcfb;
-  --color-background-dark: #0b0f19;
-  --color-codeblock: #1a1a1e;
-  
-  --font-serif: "Playfair Display", "Merriweather", ui-serif, Georgia, serif;
+  --color-background-light: #FDFDF7;
+  --color-background-dark: #09090b;
+  --color-codeblock: #09090b;
+  --color-border-dark: #151516;
+
+  --font-serif: "Tiempos Text", Georgia, Cambria, serif;
 
   --color-gray-50: #f6f6f6;
   --color-gray-100: #f1f1f1;
-  --color-gray-200: #e2e2e2;
-  --color-gray-300: #d1d1d1;
-  --color-gray-400: #a2a2a2;
+  --color-gray-200: #DEDEDE;
+  --color-gray-300: #B0B0B0;
+  --color-gray-400: #9E9E9E;
   --color-gray-500: #737373;
   --color-gray-600: #535353;
   --color-gray-700: #424242;
   --color-gray-800: #292929;
   --color-gray-900: #1a1a1a;
   --color-gray-950: #0e0e0e;
+}
+
+/* Layout container - mirrors reference's max-w-8xl (90rem) centered layout */
+:root {
+  --layout-max-width: 90rem; /* 1440px */
+  /* Navbar padding = text start position from viewport edge */
+  --layout-inset: max(32px, calc((100vw - var(--layout-max-width)) / 2 + 32px));
+  /* Sidebar left offset = inset minus sidebar's internal pl-8 (32px) so text aligns */
+  --sidebar-inset: max(0px, calc((100vw - var(--layout-max-width)) / 2));
 }
 
 /* Base styles */
@@ -34,7 +44,7 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Inter", system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--color-background-light);
   color: var(--color-gray-500);
   transition: background-color 0.3s, color 0.3s;
@@ -70,26 +80,26 @@ html.dark {
   --tw-prose-bold: var(--color-gray-200);
   --tw-prose-code: var(--color-gray-200);
   --tw-prose-pre-bg: var(--color-codeblock);
-  --tw-prose-th-borders: var(--color-gray-700);
-  --tw-prose-td-borders: var(--color-gray-800);
+  --tw-prose-th-borders: var(--color-border-dark);
+  --tw-prose-td-borders: var(--color-border-dark);
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4 {
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   color: var(--tw-prose-headings);
-  font-weight: 600;
   scroll-margin-top: 6rem;
 }
 
-.prose h1 { font-size: 2rem; line-height: 2.5rem; margin-top: 0; margin-bottom: 0.75rem; }
-.prose h2 { font-size: 1.5rem; line-height: 2rem; margin-top: 2rem; margin-bottom: 0.75rem; }
-.prose h3 { font-size: 1.25rem; line-height: 1.75rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-.prose h4 { font-size: 1.125rem; line-height: 1.5rem; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+.prose h1 { font-family: var(--font-serif); font-size: 34px; line-height: 42px; font-weight: 400; margin-top: 0; margin-bottom: 0.75rem; }
+.prose h2 { font-family: var(--font-serif); font-size: 26px; line-height: 34px; font-weight: 400; margin-top: 48px; margin-bottom: 1rem; }
+.prose h3 { font-size: 1.175rem; line-height: 1.625rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.prose h4 { font-size: 1.05rem; line-height: 1.375rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
 
 .prose p {
   color: var(--tw-prose-body);
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
-  line-height: 1.75;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .prose a {
@@ -145,7 +155,8 @@ html.dark {
   color: var(--tw-prose-body);
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
-  line-height: 1.75;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .prose blockquote {
@@ -158,7 +169,7 @@ html.dark {
 }
 
 .dark .prose blockquote {
-  border-left-color: var(--color-gray-700);
+  border-left-color: var(--color-border-dark);
   color: var(--color-gray-400);
 }
 
@@ -169,7 +180,7 @@ html.dark {
 }
 
 .dark .prose hr {
-  border-color: var(--color-gray-800);
+  border-color: var(--color-border-dark);
 }
 
 .prose img {
@@ -221,7 +232,7 @@ html.dark {
 }
 
 .dark .border-standard {
-  border-color: rgba(255,255,255,0.1);
+  border-color: var(--color-border-dark);
 }
 
 /* Search modal backdrop */
@@ -251,13 +262,10 @@ details summary {
 /* TOC active indicator */
 .toc-active {
   color: var(--color-primary);
-  border-left: 2px solid var(--color-primary);
-  padding-left: 0.5rem;
 }
 
 .dark .toc-active {
-  color: var(--color-primary-light);
-  border-left-color: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 /* Tab list should not have prose list styles */

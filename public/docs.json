@@ -17,12 +17,11 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Getting started",
         "groups": [
           {
-            "group": "Get Started",
-            "icon": "rocket",
-            "pages": ["introduction", "quickstart", "all-components-test"]
+            "group": "Getting started",
+            "pages": ["introduction", "quickstart", "changelog"]
           },
           {
             "group": "Guides",
@@ -39,7 +38,7 @@
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "Build with Claude Code",
         "groups": [
           {
             "group": "Endpoints",

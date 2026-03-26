@@ -222,48 +222,52 @@ export default function App() {
         {/* Main content area */}
         <div
           id="content-area"
-          className="relative grow box-border flex-col w-full mx-auto px-1 lg:pl-[23.7rem] lg:-ml-12 xl:w-[calc(100%-28rem)]"
+          className="relative grow box-border flex-col w-full mx-auto px-1 lg:pl-[23.7rem] lg:-ml-12 xl:pl-[calc(18rem+var(--sidebar-inset))] xl:pr-0"
         >
-          <div className="pt-[calc(var(--navbar-height)+1.75rem)] lg:pt-8 w-full max-w-4xl mx-auto px-4 sm:px-8 xl:px-12 flex-1">
+          <div className="pt-[calc(var(--navbar-height)+2rem)] lg:pt-12 w-full max-w-4xl px-4 sm:px-8 xl:pl-[96px] xl:pr-6 flex-1">
 
             {pageData ? (
               <>
                 {/* Page header */}
                 <header id="header" className="relative leading-none">
-                  {/* Breadcrumbs */}
-                  {breadcrumbs.length > 0 && (
-                    <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
-                      {breadcrumbs.map((crumb, i) => (
-                        <span key={i} className="flex items-center gap-1.5">
-                          {i > 0 && <span className="text-gray-300 dark:text-gray-600">/</span>}
-                          <span>{crumb}</span>
-                        </span>
-                      ))}
+                  {/* Category label */}
+                  {breadcrumbs.length > 1 && (
+                    <div className="text-[13px] font-bold tracking-[0.1em] uppercase text-primary dark:text-primary-light mb-2">
+                      {breadcrumbs[1]}
                     </div>
                   )}
 
-                  <div className="mt-0.5 space-y-2.5">
+                  <div className="space-y-1">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center relative gap-2 min-w-0">
-                      <h1 className="text-[2.5rem] leading-[1.1] font-serif font-medium text-gray-900 dark:text-white tracking-tight">
+                      <h1 className="text-[34px] leading-[42px] font-serif font-normal text-gray-900 dark:text-gray-200 tracking-tight mb-0">
                         {pageData.frontmatter.title}
                       </h1>
                       {/* Copy page button */}
-                      <div id="page-context-menu" className="items-center shrink-0 min-w-[156px] justify-end ml-auto sm:flex hidden">
-                        <button
-                          onClick={handleCopyPage}
-                          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                        >
-                          {copied ? (
-                            <><Check className="w-4 h-4" /> Copied!</>
-                          ) : (
-                            <><Copy className="w-4 h-4" /> Copy page</>
-                          )}
-                        </button>
+                      <div id="page-context-menu" className="items-center shrink-0 justify-end ml-auto sm:flex hidden">
+                        <div className="flex items-center h-[30px] rounded-lg border border-[#212123] text-[#c7c7c7] text-[14px] transition-colors hover:border-gray-600">
+                          <button
+                            onClick={handleCopyPage}
+                            className="flex items-center gap-1.5 px-3 h-full cursor-pointer"
+                          >
+                            {copied ? (
+                              <><Check className="w-3.5 h-3.5" /> Copied!</>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>Copy page</span>
+                              </>
+                            )}
+                          </button>
+                          <div className="w-px h-4 bg-[#212123]" />
+                          <button className="flex items-center px-2 h-full cursor-pointer">
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
                     {/* Description */}
                     {pageData.frontmatter.description && (
-                      <div className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+                      <div className="mt-0.5 text-lg text-gray-600 dark:text-gray-400">
                         <p>{pageData.frontmatter.description}</p>
                       </div>
                     )}

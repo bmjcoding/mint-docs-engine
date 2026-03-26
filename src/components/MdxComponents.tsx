@@ -148,7 +148,7 @@ export function Card({ title, icon, href, horizontal, img, cta, arrow, children 
           </div>
         )}
         {icon && (
-          <div className="h-6 w-6 fill-gray-800 dark:fill-gray-100 text-gray-800 dark:text-gray-100 shrink-0" data-component-part="card-icon">
+          <div className="h-6 w-6 fill-gray-800 dark:fill-primary-light text-gray-800 dark:text-primary-light shrink-0" data-component-part="card-icon">
             <Icon name={icon} className="w-6 h-6" />
           </div>
         )}
@@ -489,7 +489,8 @@ export function HeadingAnchor({ id, level, children }: HeadingAnchorProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const className = "flex whitespace-pre-wrap group font-semibold scroll-mt-24 items-center";
+  const baseClassName = "flex whitespace-pre-wrap group scroll-mt-24 items-center";
+  const getClassName = (lvl: number) => `${baseClassName} ${lvl === 2 ? 'font-normal' : 'font-semibold'}`;
   const inner = (
     <>
       <div className="absolute -ml-10" tabIndex={-1}>
@@ -507,10 +508,10 @@ export function HeadingAnchor({ id, level, children }: HeadingAnchorProps) {
     </>
   );
 
-  if (level === 2) return <h2 className={className} id={id}>{inner}</h2>;
-  if (level === 3) return <h3 className={className} id={id}>{inner}</h3>;
-  if (level === 4) return <h4 className={className} id={id}>{inner}</h4>;
-  return <h2 className={className} id={id}>{inner}</h2>;
+  if (level === 2) return <h2 className={getClassName(2)} id={id}>{inner}</h2>;
+  if (level === 3) return <h3 className={getClassName(3)} id={id}>{inner}</h3>;
+  if (level === 4) return <h4 className={getClassName(4)} id={id}>{inner}</h4>;
+  return <h2 className={getClassName(2)} id={id}>{inner}</h2>;
 }
 
 /* ─── Badge ─── */
