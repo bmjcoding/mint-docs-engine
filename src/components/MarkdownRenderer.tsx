@@ -12,6 +12,7 @@ import {
   Badge, Panel, RequestExample, ResponseExample,
   Update, Prompt, Tree, TreeFolder, TreeFile, Tile, Color, ColorRow, ColorItem, Tooltip
 } from './MdxComponents';
+import { InstallConfigurator } from './InstallConfigurator';
 
 interface MarkdownRendererProps {
   content: string;
@@ -68,7 +69,8 @@ function parseCustomComponents(content: string): ParsedBlock[] {
     'Expandable', 'ParamField', 'ResponseField',
     'Panel', 'RequestExample', 'ResponseExample',
     'Badge', 'Tooltip', 'Mermaid',
-    'Update', 'Prompt', 'Tree', 'Tree\\.Folder', 'TreeFolder', 'Tree\\.File', 'TreeFile', 'Tile', 'Color', 'Color\\.Row', 'ColorRow', 'Color\\.Item', 'ColorItem'
+    'Update', 'Prompt', 'Tree', 'Tree\\.Folder', 'TreeFolder', 'Tree\\.File', 'TreeFile', 'Tile', 'Color', 'Color\\.Row', 'ColorRow', 'Color\\.Item', 'ColorItem',
+    'InstallConfigurator'
   ];
 
   const tagPattern = new RegExp(
@@ -231,6 +233,8 @@ function RenderBlock({ block }: { block: ParsedBlock }) {
       return <Tooltip tip={props.tip || ''}><MarkdownRenderer content={content} /></Tooltip>;
     case 'Mermaid':
       return <Mermaid chart={props.chart || ''} />;
+    case 'InstallConfigurator':
+      return <InstallConfigurator />;
     case 'Columns':
       return <Columns cols={parseInt(props.cols || '2', 10)}><MarkdownRenderer content={content} /></Columns>;
     case 'Column':

@@ -1,104 +1,332 @@
 ---
 title: Quickstart
-description: Get up and running with the Acme API in under 5 minutes.
+description: Get up and running with Claude Code in minutes.
 icon: rocket
 ---
 
-Follow these steps to make your first API call with Acme.
+This quickstart guide will have you using AI-powered coding assistance in a few minutes. By the end, you'll understand how to use Claude Code for common development tasks.
 
-## Prerequisites
+<InstallConfigurator />
 
-Before you begin, make sure you have:
+## Before you begin
 
-- An Acme account ([sign up here](https://example.com))
-- Node.js 18+ or Python 3.9+ installed
-- A terminal or command-line interface
+Make sure you have:
 
-## Setup Guide
+- A terminal or command prompt open
+  - If you've never used the terminal before, check out the [terminal guide](/terminal-guide)
+- A code project to work with
+- A [Claude subscription](https://example.com) (Pro, Max, Teams, or Enterprise), [Claude Console](https://example.com) account, or access through a supported cloud provider
 
-<Steps>
-  <Step title="Create a Project">
-    Log in to your Acme dashboard and create a new project. Give it a descriptive name like "My First App".
+<Note>
+  This guide covers the terminal CLI. Claude Code is also available on the [web](https://example.com), as a [desktop app](/desktop), in [VS Code](/vs-code) and [JetBrains IDEs](/jetbrains), in [Slack](/slack), and in CI/CD with [GitHub Actions](/github-actions) and [GitLab](/gitlab-ci-cd). See [all interfaces](/overview).
+</Note>
 
-    Each project gets its own set of API keys and isolated data.
-  </Step>
-  <Step title="Get Your API Key">
-    Navigate to **Settings → API Keys** in your project dashboard. Click **Create Key** and copy the generated key.
+## Step 1: Install Claude Code
 
-    <Warning>
-      Keep your API key secure. Never expose it in client-side code or commit it to version control.
-    </Warning>
-  </Step>
-  <Step title="Install the SDK">
-    Install the Acme SDK for your language of choice:
+To install Claude Code, use one of the following methods:
 
-    <Tabs>
-      <Tab title="Node.js">
-        ```bash
-        npm install @acme/sdk
-        ```
-      </Tab>
-      <Tab title="Python">
-        ```bash
-        pip install acme-sdk
-        ```
-      </Tab>
-      <Tab title="Go">
-        ```bash
-        go get github.com/acme/sdk-go
-        ```
-      </Tab>
-    </Tabs>
-  </Step>
-  <Step title="Make Your First Request">
-    Initialize the client and make a test API call:
+<Tabs>
+  <Tab title="Native Install (Recommended)">
+    **macOS, Linux, WSL:**
 
-    <Tabs>
-      <Tab title="Node.js">
-        ```javascript
-        import { AcmeClient } from '@acme/sdk';
-
-        const client = new AcmeClient({
-          apiKey: process.env.ACME_API_KEY,
-        });
-
-        const users = await client.users.list();
-        console.log(users);
-        ```
-      </Tab>
-      <Tab title="Python">
-        ```python
-        from acme import AcmeClient
-
-        client = AcmeClient(api_key=os.environ["ACME_API_KEY"])
-
-        users = client.users.list()
-        print(users)
-        ```
-      </Tab>
-    </Tabs>
-
-    You should see a response like:
-
-    ```json
-    {
-      "data": [],
-      "has_more": false,
-      "total": 0
-    }
+    ```bash
+    curl -fsSL https://claude.ai/install.sh | bash
     ```
-  </Step>
-</Steps>
 
-## Next Steps
+    **Windows PowerShell:**
 
-Now that you've made your first API call, explore these resources:
+    ```powershell
+    irm https://claude.ai/install.ps1 | iex
+    ```
+
+    **Windows CMD:**
+
+    ```batch
+    curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
+    ```
+
+    **Windows requires [Git for Windows](https://git-scm.com/downloads/win).** Install it first if you don't have it.
+
+    <Info>
+      Native installations automatically update in the background to keep you on the latest version.
+    </Info>
+  </Tab>
+
+  <Tab title="Homebrew">
+    ```bash
+    brew install --cask claude-code
+    ```
+
+    <Info>
+      Homebrew installations do not auto-update. Run `brew upgrade claude-code` periodically to get the latest features and security fixes.
+    </Info>
+  </Tab>
+
+  <Tab title="WinGet">
+    ```powershell
+    winget install Anthropic.ClaudeCode
+    ```
+
+    <Info>
+      WinGet installations do not auto-update. Run `winget upgrade Anthropic.ClaudeCode` periodically to get the latest features and security fixes.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Step 2: Log in to your account
+
+Claude Code requires an account to use. When you start an interactive session with the `claude` command, you'll need to log in:
+
+```bash
+claude
+# You'll be prompted to log in on first use
+```
+
+```bash
+/login
+# Follow the prompts to log in with your account
+```
+
+You can log in using any of these account types:
+
+- [Claude Pro, Max, Teams, or Enterprise](https://example.com) (recommended)
+- [Claude Console](https://example.com) (API access with pre-paid credits). On first login, a "Claude Code" workspace is automatically created in the Console for centralized cost tracking.
+- [Amazon Bedrock, Google Vertex AI, or Microsoft Foundry](/third-party-integrations) (enterprise cloud providers)
+
+Once logged in, your credentials are stored and you won't need to log in again. To switch accounts later, use the `/login` command.
+
+## Step 3: Start your first session
+
+Open your terminal in any project directory and start Claude Code:
+
+```bash
+cd /path/to/your/project
+claude
+```
+
+You'll see the Claude Code welcome screen with your session information, recent conversations, and latest updates. Type `/help` for available commands or `/resume` to continue a previous conversation.
+
+<Tip>
+  After logging in (Step 2), your credentials are stored on your system. Learn more in [Credential Management](/authentication).
+</Tip>
+
+## Step 4: Ask your first question
+
+Let's start with understanding your codebase. Try one of these commands:
+
+```text
+what does this project do?
+```
+
+Claude will analyze your files and provide a summary. You can also ask more specific questions:
+
+```text
+what technologies does this project use?
+```
+
+```text
+where is the main entry point?
+```
+
+```text
+explain the folder structure
+```
+
+You can also ask Claude about its own capabilities:
+
+```text
+what can Claude Code do?
+```
+
+```text
+how do I create custom skills in Claude Code?
+```
+
+```text
+can Claude Code work with Docker?
+```
+
+<Note>
+  Claude Code reads your project files as needed. You don't have to manually add context.
+</Note>
+
+## Step 5: Make your first code change
+
+Now let's make Claude Code do some actual coding. Try a simple task:
+
+```text
+add a hello world function to the main file
+```
+
+Claude Code will:
+
+1. Find the appropriate file
+2. Show you the proposed changes
+3. Ask for your approval
+4. Make the edit
+
+<Note>
+  Claude Code always asks for permission before modifying files. You can approve individual changes or enable "Accept all" mode for a session.
+</Note>
+
+## Step 6: Use Git with Claude Code
+
+Claude Code makes Git operations conversational:
+
+```text
+what files have I changed?
+```
+
+```text
+commit my changes with a descriptive message
+```
+
+You can also prompt for more complex Git operations:
+
+```text
+create a new branch called feature/quickstart
+```
+
+```text
+show me the last 5 commits
+```
+
+```text
+help me resolve merge conflicts
+```
+
+## Step 7: Fix a bug or add a feature
+
+Claude is proficient at debugging and feature implementation.
+
+Describe what you want in natural language:
+
+```text
+add input validation to the user registration form
+```
+
+Or fix existing issues:
+
+```text
+there's a bug where users can submit empty forms - fix it
+```
+
+Claude Code will:
+
+- Locate the relevant code
+- Understand the context
+- Implement a solution
+- Run tests if available
+
+## Step 8: Test out other common workflows
+
+There are a number of ways to work with Claude:
+
+**Refactor code**
+
+```text
+refactor the authentication module to use async/await instead of callbacks
+```
+
+**Write tests**
+
+```text
+write unit tests for the calculator functions
+```
+
+**Update documentation**
+
+```text
+update the README with installation instructions
+```
+
+**Code review**
+
+```text
+review my changes and suggest improvements
+```
+
+<Tip>
+  Talk to Claude like you would a helpful colleague. Describe what you want to achieve, and it will help you get there.
+</Tip>
+
+## Essential commands
+
+Here are the most important commands for daily use:
+
+| Command | What it does | Example |
+| --- | --- | --- |
+| `claude` | Start interactive mode | `claude` |
+| `claude "task"` | Run a one-time task | `claude "fix the build error"` |
+| `claude -p "query"` | Run one-off query, then exit | `claude -p "explain this function"` |
+| `claude -c` | Continue most recent conversation in current directory | `claude -c` |
+| `claude -r` | Resume a previous conversation | `claude -r` |
+| `claude commit` | Create a Git commit | `claude commit` |
+| `/clear` | Clear conversation history | `/clear` |
+| `/help` | Show available commands | `/help` |
+
+See the [CLI reference](/cli-reference) for a complete list of commands.
+
+## Pro tips for beginners
+
+For more, see [best practices](/best-practices) and [common workflows](/common-workflows).
+
+<Accordion title="Be specific with your requests">
+  Instead of: "fix the bug"
+
+  Try: "fix the login bug where users see a blank screen after entering wrong credentials"
+</Accordion>
+
+<Accordion title="Use step-by-step instructions">
+  Break complex tasks into steps:
+
+  ```text
+  1. create a new database table for user profiles
+  2. create an API endpoint to get and update user profiles
+  3. build a webpage that allows users to see and edit their information
+  ```
+</Accordion>
+
+<Accordion title="Let Claude explore first">
+  Before making changes, let Claude understand your code:
+
+  ```text
+  analyze the database schema
+  ```
+
+  ```text
+  build a dashboard showing products that are most frequently returned by our UK customers
+  ```
+</Accordion>
+
+<Accordion title="Save time with shortcuts">
+  - Press `?` to see all available keyboard shortcuts
+  - Use Tab for command completion
+  - Press the up arrow key for command history
+  - Type `/` to see all commands and skills
+</Accordion>
+
+## What's next?
+
+Now that you've learned the basics, explore more advanced features:
 
 <CardGroup cols={2}>
-  <Card title="Authentication" icon="lock" href="/authentication">
-    Learn about API key management and OAuth flows.
+  <Card title="How Claude Code works" icon="microchip" href="/how-claude-code-works">
+    Understand the agentic loop, built-in tools, and how Claude Code interacts with your project
   </Card>
-  <Card title="API Reference" icon="code" href="/api/users">
-    Browse the complete API reference.
+  <Card title="Best practices" icon="star" href="/best-practices">
+    Get better results with effective prompting and project setup
+  </Card>
+  <Card title="Common workflows" icon="graduation-cap" href="/common-workflows">
+    Step-by-step guides for common tasks
+  </Card>
+  <Card title="Extend Claude Code" icon="puzzle-piece" href="/features-overview">
+    Customize with CLAUDE.md, skills, hooks, MCP, and more
   </Card>
 </CardGroup>
+
+## Getting help
+
+- **In Claude Code**: Type `/help` or ask "how do I..."
+- **Documentation**: You're here! Browse other guides
+- **Community**: Join our [Discord](https://example.com) for tips and support
