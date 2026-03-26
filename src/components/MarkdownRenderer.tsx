@@ -350,7 +350,7 @@ function HeadingWithAnchor({ level, children, ...props }: { level: 2 | 3; childr
   const id = slugify(text);
   const Tag = level === 2 ? 'h2' : 'h3';
   return (
-    <Tag className="flex whitespace-pre-wrap group font-semibold scroll-mt-24" id={id} {...props}>
+    <Tag className={`flex whitespace-pre-wrap group scroll-mt-24 ${level === 2 ? 'font-normal' : 'font-semibold'}`} id={id} {...props}>
       <div className="absolute" tabIndex={-1}>
         <a
           aria-label="Navigate to header"

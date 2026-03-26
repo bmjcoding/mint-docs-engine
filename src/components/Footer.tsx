@@ -40,7 +40,7 @@ export default function Footer({ prevPage, nextPage, onNavigate }: FooterProps) 
       </div>
 
       {/* Was this helpful */}
-      <div className="flex items-center gap-3 mt-8 py-4 border-t border-gray-100 dark:border-gray-800/50">
+      <div className="flex items-center gap-3 mt-8 py-4 border-t border-gray-100 dark:border-[#141416]">
         {feedback ? (
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Thanks for your feedback!
@@ -67,7 +67,7 @@ export default function Footer({ prevPage, nextPage, onNavigate }: FooterProps) 
       </div>
 
       {/* Footer */}
-      <footer id="footer" className="flex gap-12 justify-between pt-10 border-t border-gray-100 dark:border-gray-800/50 pb-28">
+      <footer id="footer" className="flex gap-12 justify-between pt-10 border-t border-gray-100 dark:border-[#141416] pb-28">
         <div className="flex items-center justify-between">
           <div className="sm:flex">
             <a
