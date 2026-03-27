@@ -99,10 +99,10 @@ export default function Navbar({ activeTabIdx, onTabChange, onSearchOpen, onMobi
             <div className="hidden lg:flex flex-1 items-center justify-center gap-2 min-w-0">
               <button
                 onClick={onSearchOpen}
-                className="flex items-center gap-2 h-8 rounded-lg px-3 text-sm text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors bg-gray-100 dark:bg-[#09090b] border border-gray-200 dark:border-[#212123]"
+                className="flex items-center gap-2 h-8 rounded-lg px-3 text-sm text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors bg-gray-100 dark:bg-[#09090b] border border-gray-200 dark:border-[#212123] w-full max-w-[320px]"
               >
                 <Search className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="whitespace-nowrap">Search...</span>
+                <span className="whitespace-nowrap flex-1 text-left">Search...</span>
                 <kbd className="flex h-5 items-center justify-center rounded px-1 font-sans text-xs font-medium text-gray-400 dark:text-gray-500">
                   &#8984;K
                 </kbd>
