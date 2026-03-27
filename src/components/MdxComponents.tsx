@@ -65,7 +65,7 @@ export function Callout({ type, children, title, icon, color }: CalloutProps) {
       >
         {icon && <div className="flex-none size-5 mt-0.5" style={{ color }}><Icon name={icon} className="w-5 h-5" /></div>}
         <div
-          className="text-sm min-w-0 w-full [&>:first-child]:!mt-0 [&>:last-child]:!mb-0 [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current"
+          className="text-sm min-w-0 w-full [&>:first-child]:!mt-0 [&>:last-child]:!mb-0 [&_p]:!text-current [&_li]:!text-current [&_a]:!text-current [&_a]:!decoration-current [&_strong]:!text-current [&_code]:!text-current"
           data-component-part="callout-content"
           style={{ color }}
         >
@@ -86,7 +86,7 @@ export function Callout({ type, children, title, icon, color }: CalloutProps) {
     >
       <IconComponent className={`flex-none ${cfg.iconSize} ${cfg.text} ${cfg.darkText} mt-0.5`} />
       <div
-        className={`text-sm min-w-0 w-full [&>:first-child]:!mt-0 [&>:last-child]:!mb-0 ${cfg.text} ${cfg.darkText} [&_a]:!text-current [&_a]:border-current [&_strong]:!text-current [&_code]:!text-current`}
+        className={`text-sm min-w-0 w-full [&>:first-child]:!mt-0 [&>:last-child]:!mb-0 ${cfg.text} ${cfg.darkText} [&_p]:!text-current [&_li]:!text-current [&_a]:!text-current [&_a]:!decoration-current [&_strong]:!text-current [&_code]:!text-current`}
         data-component-part="callout-content"
       >
         {title && <p className="font-semibold mb-1">{title}</p>}
@@ -218,7 +218,6 @@ export function CodeBlock({ code, language = 'text', filename, title, icon, wrap
   const [copied, setCopied] = useState(false);
   const [highlightedHtml, setHighlightedHtml] = useState<string>('');
   const [isExpanded, setIsExpanded] = useState(!expandable);
-
   useEffect(() => {
     highlight(code, language).then(setHighlightedHtml);
   }, [code, language]);
@@ -262,11 +261,6 @@ export function CodeBlock({ code, language = 'text', filename, title, icon, wrap
       )}
 
       <div className={`w-0 min-w-full max-w-full py-3.5 px-4 h-full relative text-sm leading-6 code-block-background overflow-x-auto rounded-2xl bg-white dark:bg-codeblock ${expandable && !isExpanded ? 'max-h-64' : ''}`} data-component-part="code-block-root">
-        {!displayTitle && (
-          <div className="absolute top-3 right-4 flex items-center gap-1.5 z-10">
-            {copyButton('opacity-0 group-hover:opacity-100 transition-opacity')}
-          </div>
-        )}
         {highlightedHtml ? (
           <div
             className={`shiki-wrapper font-mono whitespace-pre leading-6 [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent ${wrap ? '[&_pre]:!whitespace-pre-wrap [&_pre]:!break-words' : ''}`}
@@ -278,7 +272,11 @@ export function CodeBlock({ code, language = 'text', filename, title, icon, wrap
           </pre>
         )}
       </div>
-
+      {!displayTitle && (
+        <div className="absolute top-0 right-0 bottom-0 z-10 flex items-start pt-3 pr-3 rounded-r-2xl code-block-button-fade">
+          {copyButton('')}
+        </div>
+      )}
       {expandable && (
         <div className="flex items-center justify-center p-2 border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 relative z-20">
           <button 
@@ -441,17 +439,21 @@ interface AccordionProps {
 }
 
 export function Accordion({ title, children, defaultOpen = false }: AccordionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
     <details
-      className="accordion border-standard rounded-2xl mb-3 overflow-hidden bg-white dark:bg-[#1a1a1e] cursor-default"
+      className="accordion accordion-item border border-gray-200 dark:border-white/10 rounded-xl cursor-default"
       open={defaultOpen}
+      onToggle={(e) => setIsOpen((e.target as HTMLDetailsElement).open)}
     >
       <summary
-        className="relative not-prose flex flex-row items-center content-center w-full cursor-pointer py-4 px-5 space-x-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-t-xl [&::-webkit-details-marker]:hidden"
+        className="relative not-prose flex flex-row items-center content-center w-full cursor-pointer py-3.5 px-4 space-x-2.5 rounded-[inherit] hover:bg-gray-100 dark:hover:bg-white/[0.05] [&::-webkit-details-marker]:hidden list-none"
         data-component-part="accordion-button"
       >
-        <div className="mr-0.5" data-component-part="accordion-caret-right">
-          <ChevronRight className="h-3 w-3 transition duration-75 text-gray-700 dark:text-gray-400 [[open]>&]:rotate-90" />
+        <div className="flex-none" data-component-part="accordion-caret-right">
+          <svg className={`h-2.5 w-2.5 text-gray-500 dark:text-gray-400 transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`} viewBox="0 0 10 10" fill="currentColor">
+            <path d="M2 1.5l6 3.5-6 3.5z" />
+          </svg>
         </div>
         <div className="leading-tight text-left w-full" data-component-part="accordion-title-container">
           <p className="m-0 font-medium text-gray-900 dark:text-gray-200" data-component-part="accordion-title">
@@ -459,7 +461,7 @@ export function Accordion({ title, children, defaultOpen = false }: AccordionPro
           </p>
         </div>
       </summary>
-      <div className="px-5 pb-4 prose dark:prose-invert text-sm">
+      <div className="px-4 pl-9 pb-4 prose dark:prose-invert text-sm">
         {children}
       </div>
     </details>
@@ -489,7 +491,7 @@ export function HeadingAnchor({ id, level, children }: HeadingAnchorProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const baseClassName = "flex whitespace-pre-wrap group scroll-mt-24 items-center";
+  const baseClassName = "flex whitespace-pre-wrap group/heading scroll-mt-24 items-center";
   const getClassName = (lvl: number) => `${baseClassName} ${lvl === 2 ? 'font-normal' : 'font-semibold'}`;
   const inner = (
     <>
@@ -497,7 +499,7 @@ export function HeadingAnchor({ id, level, children }: HeadingAnchorProps) {
         <button
           aria-label="Copy link to header"
           onClick={handleCopyLink}
-          className="flex items-center opacity-0 border-0 group-hover:opacity-100 focus:opacity-100 focus:outline-0 group/link transition-opacity"
+          className="flex items-center invisible border-0 group-hover/heading:visible focus:visible focus:outline-0"
         >
           <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white dark:bg-[#1a1a1e] dark:ring-1 bg-white ring-1 ring-gray-200 dark:ring-white/10 hover:ring-gray-300 dark:hover:ring-white/30 transition-all">
             {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <LinkIcon className="w-3.5 h-3.5" />}

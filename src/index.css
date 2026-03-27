@@ -2,6 +2,41 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Code block scrollbar — always visible */
+[data-component-part="code-block-root"] {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255 255 255 / 0.15) transparent;
+}
+:where(.dark) [data-component-part="code-block-root"] {
+  scrollbar-color: rgba(255 255 255 / 0.15) transparent;
+}
+:where(:not(.dark)) [data-component-part="code-block-root"] {
+  scrollbar-color: rgba(0 0 0 / 0.15) transparent;
+}
+[data-component-part="code-block-root"]::-webkit-scrollbar {
+  height: 8px;
+}
+[data-component-part="code-block-root"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+:where(.dark) [data-component-part="code-block-root"]::-webkit-scrollbar-thumb {
+  background: rgba(255 255 255 / 0.15);
+  border-radius: 4px;
+}
+:where(:not(.dark)) [data-component-part="code-block-root"]::-webkit-scrollbar-thumb {
+  background: rgba(0 0 0 / 0.15);
+  border-radius: 4px;
+}
+
+/* Code block copy button fade backdrop */
+.code-block-button-fade {
+  background: linear-gradient(to right, transparent 0%, white 40%);
+}
+.dark .code-block-button-fade {
+  background: linear-gradient(to right, transparent 0%, var(--color-codeblock) 40%);
+}
+
 @theme {
   --color-primary: #D97757;
   --color-primary-light: #cda484;
@@ -108,12 +143,12 @@ html.dark {
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
-  text-decoration-color: var(--color-gray-300);
+  text-decoration-color: var(--color-primary-dark);
   transition: text-decoration-color 0.15s, color 0.15s;
 }
 
 .dark .prose a {
-  text-decoration-color: var(--color-gray-700);
+  text-decoration-color: var(--color-primary-light);
 }
 
 .prose a:hover, .dark .prose a:hover {
@@ -134,7 +169,7 @@ html.dark {
 }
 
 .dark .prose code:not(pre code) {
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255,255,255,0.15);
 }
 
 .prose ul {
@@ -226,13 +261,32 @@ html.dark {
   text-shadow: -0.2px 0 0 currentColor, 0.2px 0 0 currentColor;
 }
 
-/* Border standard for accordions */
+/* Border standard */
 .border-standard {
   border: 1px solid var(--color-gray-200);
 }
 
 .dark .border-standard {
   border-color: var(--color-border-dark);
+}
+
+/* Accordion group: collapse borders between adjacent items */
+.accordion-item + .accordion-item {
+  margin-top: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.accordion-item:has(+ .accordion-item) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.accordion-item + .accordion-item > summary {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.accordion-item:has(+ .accordion-item) > summary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 /* Search modal backdrop */
